@@ -1,0 +1,185 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .hero-section {
+        background-image: linear-gradient(135deg, #2563eb, #6b21a8);
+        position: relative;
+        overflow: hidden;
+        border-radius: 1.5rem !important; /* matches rounded-3xl */
+    }
+
+        .hero-section .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://placehold.co/1920x1080/000000/FFFFFF?text=Abstract+Data+Flow');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.2;
+            z-index: 1;
+        }
+
+        .hero-section .content {
+            position: relative;
+            z-index: 2;
+        }
+
+    .themed-heading {
+        color: #2563eb;
+        border-color: #6b21a8 !important;
+    }
+
+    .card-themed {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+
+        .card-themed:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+</style>
+<div class="container-fluid p-4 p-sm-6 p-lg-8 h-100 overflow-auto">
+
+    <!-- Hero Section -->
+    <section class="hero-section text-white shadow-lg p-5 p-md-5 p-lg-6 mb-5">
+        <div class="overlay"></div>
+        <div class="content text-center">
+            <h1 class="display-3 fw-bolder mb-4">
+                Empower Your Business with <br class="d-none d-sm-inline">Intelligent Operations
+            </h1>
+            <p class="fs-4 fw-light mb-4 opacity-75">
+                Seamlessly integrate, analyze, and optimize your ERP and Business Intelligence processes.
+            </p>
+            <a href="#dashboards" class="btn btn-light btn-lg rounded-pill px-5 py-3 fw-bold shadow-sm" style="color: #6b21a8;">
+                <i class="bi bi-graph-up-arrow me-2"></i>
+                Explore Your Dashboards
+            </a>
+        </div>
+    </section>
+
+    <!-- Key Module Highlights -->
+    <section class="mb-5">
+        <h2 class="h3 fw-bolder themed-heading text-center mb-5 pb-3 d-inline-block">
+            Core Modules & Capabilities
+        </h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+            <!-- Card 1 -->
+            <div class="col">
+                <div class="card card-themed h-100 rounded-4 shadow-sm flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front card-body text-center">
+                            <i class="bi bi-truck display-4 text-primary mb-3"></i>
+                            <h5 class="card-title fw-bold">ERP Integration</h5>
+                            <p class="card-text text-muted">Connect your Enterprise Resource Planning systems for real-time data flow.</p>
+                        </div>
+                        <div class="flip-card-back card-body text-center d-flex flex-column justify-content-center align-items-center">
+                            <h5 class="card-title fw-bold mb-3">Real-Time Data Flow</h5>
+                            <p class="card-text text-muted">
+                                ERP systems enable seamless, real-time exchange of information across departments—finance, inventory, sales, and more. ERP systems enable real-time data sharing across departments, improving decisions, eliminating silos, and boosting efficiency.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="col">
+                <div class="card card-themed h-100 rounded-4 shadow-sm flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front card-body text-center">
+                            <i class="bi bi-truck display-4 text-primary mb-3"></i>
+                            <h5 class="card-title fw-bold">Business Intelligence</h5>
+                            <p class="card-text text-muted">Visualize key performance indicators with dynamic and interactive dashboards</p>
+                        </div>
+                        <div class="flip-card-back card-body text-center d-flex flex-column justify-content-center align-items-center">
+                            <h5 class="card-title fw-bold mb-3">Real-Time Data Flow</h5>
+                            <p class="card-text text-muted">
+                                Business Intelligence (BI) turns data into insights through reports, analytics, and visuals, enabling smarter decisions and strategic growth.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="col">
+                <div class="card card-themed h-100 rounded-4 shadow-sm flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front card-body text-center">
+                            <i class="bi bi-truck display-4 text-primary mb-3"></i>
+                            <h5 class="card-title fw-bold">Automated Pipelines</h5>
+                            <p class="card-text text-muted">Set up and manage automated data pipelines to ensure consistency and efficiency.</p>
+                        </div>
+                        <div class="flip-card-back card-body text-center d-flex flex-column justify-content-center align-items-center">
+                            <h5 class="card-title fw-bold mb-3">Real-Time Data Flow</h5>
+                            <p class="card-text text-muted">
+                                Streamline decision-making with continuous, real-time data movement across systems—no delays, no bottlenecks.
+                                Stay responsive to changes as they happen with always-synced, live data feeds.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 4 -->
+            <div class="col">
+                <div class="card card-themed h-100 rounded-4 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-shield-lock display-4 text-primary mb-3"></i>
+                        <h5 class="card-title fw-bold">Security & Compliance</h5>
+                        <p class="card-text text-muted">Maintain data integrity and meet regulatory standards with robust security features.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Access / Featured Dashboards -->
+    <section id="dashboards" class="mb-5">
+        <h2 class="h3 fw-bolder themed-heading text-center mb-5 pb-3 d-inline-block">
+            Quick Access Dashboards
+        </h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+            <!-- Dashboard Card 1 -->
+            <div class="col">
+                <div class="card card-themed h-100 rounded-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold"><i class="bi bi-journal-text me-2"></i>Projects Summary</h5>
+                        <p class="card-text text-muted">A summary of your ongoing and completed projects, including status, deadlines, and key milestones.</p>
+                        <a asp-page="/Dashboards/Projects" class="btn btn-outline-primary btn-sm mt-3">View Projects</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Dashboard Card 2 -->
+            <div class="col">
+                <div class="card card-themed h-100 rounded-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold"><i class="bi bi-box-seam me-2"></i>Inventory & Logistics</h5>
+                        <p class="card-text text-muted">Monitor stock levels, track shipments, and optimize your supply chain.</p>
+                        <a asp-page="/Dashboards/Operations" class="btn btn-outline-primary btn-sm mt-3">View Dashboard</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Dashboard Card 3 -->
+            <div class="col">
+                <div class="card card-themed h-100 rounded-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold"><i class="bi bi-cash-stack me-2"></i>Financial Overview</h5>
+                        <p class="card-text text-muted">Get a real-time view of cash flow, budgets, and financial health.</p>
+                        <a asp-page="/Dashboards/Finance" class="btn btn-outline-primary btn-sm mt-3">View Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>

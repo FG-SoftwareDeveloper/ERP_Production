@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ERP_Operations_Production</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN (for rapid prototyping, consider building locally for production) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Bootstrap 5 CSS (kept for general components like navbar, but removed table-specific styles) -->
+    <!-- Head section -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- DataTables CSS (Core) - No Bootstrap integration CSS for DataTables, rely on custom Tailwind styling -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.3.1/css/rowGroup.dataTables.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ERP_Operations_Production.styles.css" asp-append-version="true" />
+</head>
+<body class="dashboard-gradient">
+ 
+    <div class="d-flex dashboard-container" id="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar-full d-flex flex-column" id="sidebar-wrapper">
+            <div class="sidebar-heading text-center py-3">
+                <a asp-page="/Index">
+                    <img src="~/img/sidebar_logo.png" alt="HardRock Infrastructure LLC Logo" class="sidebar-logo" />
+                </a>
+            </div>
+            <nav id="sidebarMenu" class="nav flex-column mt-2">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dashboardDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-speedometer me-2"></i> Dashboard
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dashboardDropdown">
+                        <li><a class="dropdown-item" asp-page="/Dashboards/Admin">Admin Dashboard</a></li>
+                        <li><a class="dropdown-item" asp-page="/Dashboards/Finance">Finance Dashboard</a></li>
+                        <li><a class="dropdown-item" asp-page="/Dashboards/HR">HR Dashboard</a></li>
+                        <li><a class="dropdown-item" asp-page="/Dashboards/Operations">Operations Dashboard</a></li>
+                        <li><a class="dropdown-item" asp-page="/Dashboards/Projects">Projects Dashboard</a></li>
+                    </ul>
+                </li>
+
+                <a asp-page="/Accounts/Accounts" class="nav-link">
+                    <i class="bi bi-cash-coin me-2"></i> Accounts
+                </a>
+                <a asp-page="/APInvoices/ListAPInvoice" class="nav-link">
+                    <i class="bi bi-file-earmark-spreadsheet me-2"></i> AP Invoices
+                </a>
+                <a asp-page="/ARInvoices/ListARInvoices" class="nav-link">
+                    <i class="bi bi-receipt me-2"></i> AR Invoices
+                </a>
+                <a asp-page="/BankAccounts/ListBankAccounts" class="nav-link">
+                    <i class="bi bi-bank me-2"></i> Bank Accounts
+                </a>
+                <a asp-page="/Companies/ListCompanies" class="nav-link">
+                    <i class="bi bi-building me-2"></i> Companies
+                </a>
+                <a asp-page="/Customers/ListCustomers" class="nav-link">
+                    <i class="bi bi-people me-2"></i> Customers
+                </a>
+                <a asp-page="/Departments/ListDepartments" class="nav-link">
+                    <i class="bi bi-diagram-3 me-2"></i> Departments
+                </a>
+                <a asp-page="/Documents/ListDocuments" class="nav-link">
+                    <i class="bi bi-folder me-2"></i> Documents
+                </a>
+                <a asp-page="/EmployeePayDetails/ListEmployeePay" class="nav-link">
+                    <i class="bi bi-wallet me-2"></i> Employee Pay
+                </a>
+                <a asp-page="/Employees/ListEmployees" class="nav-link">
+                    <i class="bi bi-person-badge me-2"></i> Employees
+                </a>
+                <a asp-page="/Equipment/ListEquipment" class="nav-link">
+                    <i class="bi bi-tools me-2"></i> Equipment
+                </a>
+                <a asp-page="/FinancialSnapshots/ListFinancialSnapshot" class="nav-link">
+                    <i class="bi bi-graph-up me-2"></i> Financial Snapshot
+                </a>
+                <a asp-page="/JournalEntries/ListJournalEntries" class="nav-link">
+                    <i class="bi bi-journal-text me-2"></i> Journal
+                </a>
+                <a asp-page="/MaintenanceRecords/ListMaintenanceRecords" class="nav-link">
+                    <i class="bi bi-wrench me-2"></i> Maintenance Records
+                </a>
+                <a asp-page="/Materials/ListMaterials" class="nav-link">
+                    <i class="bi bi-box-seam me-2"></i> Materials
+                </a>
+                <a asp-page="/MaterialUsage/ListMaterialUsage" class="nav-link">
+                    <i class="bi bi-truck me-2"></i> Material Usage
+                </a>
+                <a asp-page="/Payments/ListPayments" class="nav-link">
+                    <i class="bi bi-credit-card me-2"></i> Payments
+                </a>
+                <a asp-page="/PayrollRuns/ListPayrollRuns" class="nav-link">
+                    <i class="bi bi-calculator me-2"></i> Payroll Runs
+                </a>
+                <a asp-page="/ProjectFinancialSummary/ListProjectFinancialSummary" class="nav-link">
+                    <i class="bi bi-pie-chart me-2"></i> Project Financial Summary
+                </a>
+                <a asp-page="/Projects/ListProjects" class="nav-link">
+                    <i class="bi bi-kanban me-2"></i> Projects
+                </a>
+                <a asp-page="/PurchaseOrderLines/ListPurchaseOrderLines" class="nav-link">
+                    <i class="bi bi-list-ol me-2"></i> Purchase Order Lines
+                </a>
+                <a asp-page="/PurchaseOrders/ListPurchaseOrders" class="nav-link">
+                    <i class="bi bi-cart-check me-2"></i> Purchase Orders
+                </a>
+                <a asp-page="/Receipts/ListReceipts" class="nav-link">
+                    <i class="bi bi-clipboard-check me-2"></i> Receipts
+                </a>
+                <a asp-page="/RFIs/ListRFIs" class="nav-link">
+                    <i class="bi bi-question-circle me-2"></i> RFIs
+                </a>
+                <a asp-page="/Roles/ListRoles" class="nav-link">
+                    <i class="bi bi-person-fill-gear me-2"></i> Roles
+                </a>
+                <a asp-page="/ServiceAgreements/ListServiceAgreements" class="nav-link">
+                    <i class="bi bi-handshake me-2"></i> Service Agreements
+                </a>
+                <a asp-page="/ServiceOrders/ListServiceOrders" class="nav-link">
+                    <i class="bi bi-clipboard-data me-2"></i> Service Orders
+                </a>
+            </nav>
+        </div>
+        <!-- /#sidebar-wrapper -->
+        <!-- Page Content Wrapper -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">ERP BI Operations</a>
+                    <div class="position-absolute top-0 end-0 mt-2 me-2">
+                        <label class="theme-switch">
+                            <input type="checkbox" id="themeToggle">
+                            <span class="slider">
+                                <i class="bi bi-sun-fill"></i>
+                                <i class="bi bi-moon-fill"></i>
+                            </span>
+                        </label>
+                    </div>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" id="combinedNavbarSidebarToggle">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" asp-page="/Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Features</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Pricing</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                            </li>
+                        </ul>
+                        <ul class="navbar-nav">
+                          
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid py-4">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - ERP_Operations_Production - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        </div>
+    </footer>
+    <!-- jQuery (must be loaded before DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Bootstrap 5 JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <!-- DataTables JS (Core) -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/rowgroup/1.3.1/js/dataTables.rowGroup.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,96 @@
+﻿@page
+@model MyApp.Namespace.ProjectsModel
+@{
+}
+<div class="mx-auto p-4 sm:p-6 lg:p-8 glass-effect rounded-lg">
+    <h2 class="text-4xl themed-heading font-extrabold mb-6 border-b-4 pb-2 inline-block">Projects Dashboard: Overview & Progress</h2>
+
+    <!-- Key Project Metrics (KPIs) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Total Active Projects</h3>
+            <p class="text-4xl font-bold text-blue-600 mt-auto">75</p>
+            <span class="text-sm text-gray-500">This Quarter: +5 New</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Projects On Track</h3>
+            <p class="text-4xl font-bold text-green-600 mt-auto">62</p>
+            <span class="text-sm text-gray-500">83% of Active Projects</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Projects At Risk/Overdue</h3>
+            <p class="text-4xl font-bold text-red-600 mt-auto">8</p>
+            <span class="text-sm text-gray-500">Requires Attention</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Average Completion Rate</h3>
+            <p class="text-4xl font-bold text-purple-600 mt-auto">78%</p>
+            <span class="text-sm text-gray-500">Across All Projects</span>
+        </div>
+    </div>
+
+    <!-- Project Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="data-card glass-effect rounded-xl p-6 border shadow-md">
+            <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Project Status Breakdown</h3>
+            <div style="height: 300px;">
+
+                <canvas id="projectStatusChart"></canvas>
+            </div>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border shadow-md">
+            <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Project Progress Over Time (Last 6 Months)</h3>
+            <div style="height: 300px;">
+                <canvas id="projectProgressTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Project Updates Table -->
+    <div class="mb-8">
+        <h3 class="text-2xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Recent Project Updates</h3>
+        <div class="mb-6 flex flex-wrap gap-4 items-center">
+            <button id="toggleViewBtn_projectsUpdatesTable" class="flex items-center px-6 py-3 btn-themed font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-blue-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Switch to Card View
+            </button>
+            <button id="toggleChartBtn_projectsUpdatesTable" class="flex items-center px-6 py-3 btn-themed-secondary font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-green-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>
+                Show Chart
+            </button>
+        </div>
+
+        <table id="projectsUpdatesTable" class="display w-full text-left border-collapse rounded-lg shadow-md" style="width:100%">
+            <thead>
+                <tr>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tl-xl">Project ID</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Project Name</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Last Update</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Progress (%)</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tr-xl">Manager</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <div id="projectsUpdatesTable-card-view" class="mt-8 cards-grid-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" style="display: none;"></div>
+        <div id="projectsUpdatesTable-chart-container" style="display: none;">
+            <canvas id="projectsUpdatesTable-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- Quick Links / Project Tools Section -->
+    <div class="mb-8">
+        <h3 class="text-2xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Project Tools & Quick Links</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <a href="/Projects/All" class="data-card glass-effect rounded-xl p-6 border hover:shadow-xl transition-shadow duration-300 flex items-center justify-center flex-col text-center">
+                <svg class="w-16 h-16 text-blue-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                <span class="text-xl font-semibold text-primary">View All Projects</span>
+            </a>
+            <a href="/Projects/New" class="data-card glass-effect rounded-xl p-6 border hover:shadow-xl transition-shadow duration-300 flex items-center justify-center flex-col text-center">
+            </a>
+        </div>
+    </div>
+</div>

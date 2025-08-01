@@ -1,0 +1,235 @@
+﻿@page
+@model MyApp.Namespace.ListCustomersModel
+@{
+    ViewData["Title"] = "Customers";
+}
+
+<div class="container mx-auto p-4 sm:p-6 lg:p-8 bg-gray-50 rounded-lg shadow-inner">
+    <h2 class="text-4xl font-extrabold text-gray-800 mb-6 border-b-4 border-blue-600 pb-2 inline-block">Customers Overview</h2>
+
+    <div class="mb-6 flex flex-wrap gap-4 items-center">
+        <button id="toggleViewBtn_customersTable" class="flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-blue-300">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            Switch to Card View
+        </button>
+        <button id="toggleChartBtn_customersTable" class="flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-800 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-green-300">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>
+            Show Chart
+        </button>
+    </div>
+
+    <!-- Customers Table Container -->
+    <div class="overflow-x-auto bg-white rounded-xl shadow-lg p-4">
+        <table id="customersTable" class="min-w-full leading-normal">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-xl">Customer ID</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer Name</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contact Person</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Address</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Billing Terms</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tr-xl">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @* DataTables will populate this tbody *@
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    @*
+        Ensure site.js is loaded from _Layout.cshtml.
+        Only include your custom script for this page here.
+    *@
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            const customersTableId = "customersTable"; // Specific ID for Customers table
+
+            LoadDataTable({
+                tableId: customersTableId,
+                ajaxUrl: "/api/Customers", // Your API endpoint for Customers
+                columns: [
+                    { data: "customerId", title: "Customer ID" }, // Assuming property name is customerId
+                    { data: "customerName", title: "Customer Name" }, // Assuming property name is customerName
+                    { data: "contactPerson", title: "Contact Person" }, // Assuming property name is contactPerson
+                    { data: "address", title: "Address" }, // Assuming property name is address
+                    { data: "billingTerms", title: "Billing Terms" }, // Assuming property name is billingTerms
+                    {
+                        data: null,
+                        title: "Actions",
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row) {
+                            const customerId = row.customerId; // Assuming primary key is customerId
+                            return `
+                                <a href="/Customers/Edit/${customerId}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200 mr-2">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    Edit
+                                </a>
+                                <a href="/Customers/Delete/${customerId}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200" onclick="return confirm('Are you sure you want to delete this Customer?');">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    Delete
+                                </a>
+                            `;
+                        }
+                    }
+                ],
+                pageLength: 10,
+                initialIsCardView: false,
+                initialIsChartView: false,
+                chartConfig: {
+                    type: 'bar', // Bar chart to visualize customer distribution or a simple count
+                    processData: function (apiData, columns) {
+                        console.log("Processing data for Customers chart:", apiData);
+
+                        const labels = apiData.map(item => item.customerName); // X-axis labels: Customer Name
+
+                        // For Customers, without inherent numerical data for a meaningful chart,
+                        // we'll use a dummy value (e.g., 1) for the Y-axis to represent a count per customer
+                        // and include ContactPerson and Address for the tooltip.
+                        const dataPoints = apiData.map(item => ({
+                            x: item.customerName,
+                            y: 1, // Using a dummy value of 1 for each customer for visualization
+                            contactPerson: item.contactPerson,
+                            address: item.address,
+                            billingTerms: item.billingTerms
+                        }));
+
+                        return {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Number of Customers', // More appropriate label for a count
+                                data: dataPoints,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.6)', // Red
+                                    'rgba(54, 162, 235, 0.6)', // Blue
+                                    'rgba(255, 206, 86, 0.6)', // Yellow
+                                    'rgba(75, 192, 192, 0.6)', // Green
+                                    'rgba(153, 102, 255, 0.6)' // Purple
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)'
+                                ],
+                                borderWidth: 1,
+                                borderRadius: 5 // Rounded bars
+                            }]
+                        };
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Count', // Y-axis title for a count
+                                    font: { size: 14, family: 'Inter, sans-serif' }
+                                },
+                                ticks: {
+                                    stepSize: 1, // Ensure integer ticks for count
+                                    font: {
+                                        family: 'Inter, sans-serif'
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(200, 200, 200, 0.2)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Customer Name', // X-axis title
+                                    font: { size: 14, family: 'Inter, sans-serif' }
+                                },
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    font: {
+                                        family: 'Inter, sans-serif'
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Customer Distribution', // Chart title
+                                font: { size: 20, family: 'Inter, sans-serif', weight: 'bold' },
+                                color: '#333'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    font: { family: 'Inter, sans-serif' }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += context.parsed.y; // Display the count
+                                        }
+                                        return label;
+                                    },
+                                    afterLabel: function(context) {
+                                        const contactPerson = context.raw ? context.raw.contactPerson : null;
+                                        const address = context.raw ? context.raw.address : null;
+                                        const billingTerms = context.raw ? context.raw.billingTerms : null;
+                                        let details = [];
+                                        if (contactPerson) details.push(`Contact: ${contactPerson}`);
+                                        if (address) details.push(`Address: ${address}`);
+                                        if (billingTerms) details.push(`Billing Terms: ${billingTerms}`);
+                                        return details.join('\n');
+                                    }
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeOutQuart'
+                        },
+                        font: {
+                            family: 'Inter, sans-serif'
+                        }
+                    }
+                }
+            });
+
+            // Event listener for the table/card toggle button
+            $(`#toggleViewBtn_${customersTableId}`).on('click', function () {
+                toggleTableView(customersTableId);
+                const $btn = $(this);
+                const instanceState = dataTableManager[customersTableId];
+                if (instanceState.isCardView) {
+                    $btn.html('<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>Switch to Table View');
+                } else {
+                    $btn.html('<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>Switch to Card View');
+                }
+            });
+
+            // Event listener for the chart toggle button
+            $(`#toggleChartBtn_${customersTableId}`).on('click', function () {
+                toggleChartView(customersTableId);
+                const $btn = $(this);
+                const instanceState = dataTableManager[customersTableId];
+                 if (instanceState.isChartView) {
+                    $btn.html('<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v10zm12 0V7m0 10a2 2 0 01-2 2h-2a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v10zm-6 0V7m0 10a2 2 0 01-2 2h-2a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v10z"></path></svg>Show Table/Card');
+                } else {
+                    $btn.html('<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>Show Chart');
+                }
+            });
+        });
+    </script>
+}

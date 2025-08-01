@@ -1,0 +1,653 @@
+/* Theme Variables */
+:root {
+    /* Light Mode Base Colors */
+    --bg-primary: #F0F2F5; /* Very light gray for body background */
+    --bg-surface: #FFFFFF; /* Pure white for cards, sidebar, content blocks */
+    --text-primary: #1A1A1A; /* Default dark text */
+    --text-secondary: #5A6772; /* Muted text */
+    --border-color: #e2e8f0; /* Light borders */
+    --shadow-color: rgba(0, 0, 0, 0.1); /* Soft shadow */
+    /* Light Mode Glassmorphism Properties */
+    --glass-bg-base: 255, 255, 255; /* RGB for white */
+    --glass-bg-opacity: 0.7; /* Higher opacity for light mode glass */
+    --glass-border-base: 255, 255, 255; /* RGB for white */
+    --glass-border-opacity: 0.8; /* More prominent border for light mode glass */
+    --glass-blur-strength: 15px; /* Stronger blur for glass effect */
+    --glass-shadow-strength: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Distinct glass shadow */
+    /* Geometric Background Colors (Light Mode) - More vibrant */
+    --geometric-bg-color1: #a7d9ff; /* Soft blue */
+    --geometric-bg-color2: #e0f2fe; /* Lighter blue */
+    --geometric-bg-color3: #f0f9ff; /* Very light blue */
+    /* Table Header Colors (Light Mode) */
+    --table-header-bg: #bfdbfe; /* Tailwind blue-200 */
+    --table-header-text: #1e40af; /* Tailwind blue-800 */
+    /* Primary Brand Colors (remain consistent across themes if desired) */
+    --color-primary-500: #1160B1;
+    --color-primary-600: #0E4E94;
+    --color-primary-300: #6484C3;
+    --color-primary-alt: #007C91;
+    --color-secondary-brand: #23BFBF;
+    --color-deep-purple: #320058;
+    /* Semantic Colors */
+    --color-success: #2E8540;
+    --color-warning: #F6BE00;
+    --color-error: #C9191E;
+    --color-info: #2B8CC4;
+    --color-on-primary: #FFFFFF; /* Text color on primary-colored elements */
+    /* For dynamic shadows with rgba */
+    --color-primary-500-rgb: 17, 96, 177;
+}
+
+[data-theme="dark"] {
+    /* Dark Mode Base Colors (Inspired by image) */
+    --bg-primary: #221A36; /* Deep desaturated purple for body background */
+    --bg-surface: #2F244C; /* Slightly lighter, muted purple for non-glass elements */
+    --text-primary: #F7FAFC; /* White text */
+    --text-secondary: #A0AEC0; /* Muted light text */
+    --border-color: #4A3C6B; /* Subtle purple-gray border */
+    --shadow-color: rgba(0, 0, 0, 0.4); /* Stronger dark shadow */
+    /* Dark Mode Glassmorphism Properties (Inspired by image) */
+    --glass-bg-base: 47, 36, 76; /* RGB of --bg-surface for glass base */
+    --glass-bg-opacity: 0.85; /* Higher opacity for dark mode glass cards */
+    --glass-border-base: 74, 60, 107; /* RGB of --border-color for a more defined border */
+    --glass-border-opacity: 0.9; /* More prominent border for dark mode glass */
+    --glass-blur-strength: 15px;
+    --glass-shadow-strength: 0 8px 32px 0 rgba(0, 0, 0, 0.6); /* Darker glass shadow */
+    /* Geometric Background Colors (Dark Mode) - Blending with new purple theme */
+    --geometric-bg-color1: #3B2C5B; /* Lighter purple */
+    --geometric-bg-color2: #1A132B; /* Darker purple */
+    --geometric-bg-color3: #221A36; /* Same as primary background */
+    /* Table Header Colors (Dark Mode) */
+    --table-header-bg: rgba(var(--glass-bg-base), 0.9); /* Use a more opaque glass base for dark mode header */
+    --table-header-text: var(--text-primary); /* Ensure header text is primary text color */
+}
+
+
+/* Base styles, potentially overridden by Tailwind */
+html {
+    font-size: 16px;
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Focus styles for interactive elements */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem var(--bg-surface), 0 0 0 0.25rem var(--color-primary-500);
+}
+
+/* --- Layout Specific Styles --- */
+.dashboard-container {
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Geometric Background (applied to body via dashboard-gradient class) */
+.dashboard-gradient {
+    height: 100vh;
+    width: 100vw;
+    background: radial-gradient(circle at 15% 25%, var(--geometric-bg-color1) 0%, transparent 50%), radial-gradient(circle at 85% 75%, var(--geometric-bg-color2) 0%, transparent 50%), radial-gradient(circle at 50% 50%, var(--geometric-bg-color3) 0%, transparent 70%), var(--bg-primary);
+    background-size: 200% 200%, 200% 200%, 200% 200%, auto;
+    background-position: top left, bottom right, center center, center center;
+    background-repeat: no-repeat;
+    transition: background-color 0.3s ease, background-image 0.3s ease;
+}
+
+/* Reusable Glassmorphism Effect */
+.glass-effect {
+    background: rgba(var(--glass-bg-base), var(--glass-bg-opacity));
+    border: 1px solid rgba(var(--glass-border-base), var(--glass-border-opacity));
+    backdrop-filter: blur(var(--glass-blur-strength));
+    -webkit-backdrop-filter: blur(var(--glass-blur-strength)); /* For Safari */
+    box-shadow: var(--glass-shadow-strength);
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+/* Sidebar */
+.sidebar-full {
+    width: 260px;
+    max-width: 260px;
+    min-width: 220px;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Light mode: solid white, dark mode: themed glass */
+    background-color: var(--bg-surface); /* solid white in light, purple in dark */
+    color: var(--text-primary);
+    border-right: 1px solid var(--border-color);
+    /* Optional: you can keep the blur only for dark mode */
+    backdrop-filter: blur(var(--glass-blur-strength));
+    -webkit-backdrop-filter: blur(var(--glass-blur-strength));
+    box-shadow: var(--glass-shadow-strength);
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+}
+
+    .sidebar-full::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Edge */
+    }
+
+
+
+.sidebar-heading {
+    color: var(--text-primary); /* Themed text */
+}
+
+/* Styling for the nav-link items within the sidebar menu */
+#sidebarMenu .nav-link {
+    border-radius: 16px;
+    padding: 10px 16px;
+    margin: 10px 0;
+    /* Apply glass-effect here */
+    background: rgba(var(--glass-bg-base), var(--glass-bg-opacity));
+    border: 1px solid rgba(var(--glass-border-base), var(--glass-border-opacity));
+    backdrop-filter: blur(var(--glass-blur-strength));
+    -webkit-backdrop-filter: blur(var(--glass-blur-strength));
+    box-shadow: 0 4px 10px var(--shadow-color), inset 1px 1px 3px rgba(var(--glass-border-base), var(--glass-border-opacity)), inset -1px -1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text-secondary); /* Themed muted text */
+    font-weight: 500;
+    font-size: 15px;
+}
+
+    #sidebarMenu .nav-link:hover {
+        background: rgba(var(--glass-bg-base), var(--glass-bg-opacity) + 0.1); /* Slightly more opaque on hover */
+        border-color: rgba(var(--glass-border-base), var(--glass-border-opacity) + 0.1);
+        box-shadow: var(--glass-shadow-strength), 0 0 8px rgba(var(--glass-border-base), var(--glass-border-opacity) + 0.2) inset;
+        color: var(--color-primary-500);
+    }
+
+    /* Styling for icons within the sidebar links */
+    #sidebarMenu .nav-link i {
+        transition: all 0.2s ease-in-out;
+        font-size: 18px;
+        color: var(--text-secondary);
+    }
+
+    #sidebarMenu .nav-link:hover i {
+        color: var(--color-primary-600);
+        filter: drop-shadow(0 0 4px rgba(0, 86, 179, 0.5));
+    }
+
+    /* Styling for the active sidebar menu item */
+    #sidebarMenu .nav-link.active {
+        color: var(--color-on-primary);
+        background: var(--color-primary-500); /* Solid primary color for active state */
+        border-radius: 20px;
+        padding: 10px 16px;
+        backdrop-filter: none; /* No blur for solid active state */
+        box-shadow: 0 4px 10px var(--shadow-color), inset 0 0 5px rgba(255, 255, 255, 0.3);
+    }
+
+        /* Active icon color */
+        #sidebarMenu .nav-link.active i {
+            color: var(--color-on-primary);
+        }
+
+/* Page Content Wrapper */
+#page-content-wrapper {
+    min-width: 100vw;
+    overflow-y: auto;
+    background-color: var(--bg-primary); /* Main content background */
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+    /* Top Navbar Theming - apply glass effect */
+    #page-content-wrapper .navbar {
+        background: rgba(var(--glass-bg-base), var(--glass-bg-opacity));
+        border-bottom: 1px solid rgba(var(--glass-border-base), var(--glass-border-opacity));
+        backdrop-filter: blur(var(--glass-blur-strength));
+        -webkit-backdrop-filter: blur(var(--glass-blur-strength));
+        box-shadow: var(--glass-shadow-strength);
+        transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
+    }
+
+    #page-content-wrapper .navbar-brand,
+    #page-content-wrapper .navbar-nav .nav-link {
+        color: var(--text-primary) !important; /* Ensure text color adapts */
+        transition: color 0.3s ease;
+    }
+
+/* For Bootstrap 5.3.2, the navbar-toggler-icon uses background-image property
+   which is a SVG. We need to override it based on the theme. */
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%231a1a1a' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+[data-theme="dark"] .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23f7fafc' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Toggle states for the wrapper */
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: 0;
+}
+
+/* Responsive adjustments for sidebar */
+@media (min-width: 768px) {
+    .sidebar-full {
+        margin-left: 0;
+    }
+
+    #page-content-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -15rem;
+    }
+}
+
+/* Chart container styling */
+.chart-container {
+    position: relative;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    height: 400px;
+    max-height: 500px;
+    /* Apply glass-effect here */
+    background: rgba(var(--glass-bg-base), var(--glass-bg-opacity));
+    border: 1px solid rgba(var(--glass-border-base), var(--glass-border-opacity));
+    backdrop-filter: blur(var(--glass-blur-strength));
+    -webkit-backdrop-filter: blur(var(--glass-blur-strength));
+    box-shadow: var(--glass-shadow-strength);
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+@media (min-width: 768px) {
+    .chart-container {
+        height: 450px;
+    }
+}
+
+/* Toggle Switch specific styles */
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+    .theme-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-primary-300); /* Light blue for light mode */
+    transition: .4s;
+    border-radius: 34px;
+    /* Subtle glass effect for the slider track */
+    background: rgba(var(--glass-bg-base), 0.5); /* Slightly less opaque */
+    border: 1px solid rgba(var(--glass-border-base), 0.6);
+    backdrop-filter: blur(5px); /* Lighter blur for toggle */
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: var(--color-on-primary); /* Knob color adapts to theme */
+        transition: .4s;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+input:checked + .slider {
+    background-color: var(--color-deep-purple); /* Dark purple for dark mode */
+    background: rgba(var(--glass-bg-base), 0.5); /* Use dark mode glass base */
+    border: 1px solid rgba(var(--glass-border-base), 0.6);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--color-primary-500);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Icon for the slider */
+.slider .bi {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    transition: opacity 0.4s ease, color 0.4s ease;
+}
+
+.slider .bi-sun-fill {
+    left: 8px;
+    color: var(--text-primary); /* Sun color adapts */
+    opacity: 1;
+}
+
+.slider .bi-moon-fill {
+    right: 8px;
+    color: var(--text-primary); /* Moon color adapts */
+    opacity: 0; /* Hidden by default */
+}
+
+input:checked + .slider .bi-sun-fill {
+    opacity: 0;
+}
+
+input:checked + .slider .bi-moon-fill {
+    opacity: 1;
+}
+
+/* Themed buttons for "Switch to Card View" and "Show Chart" */
+.btn-themed {
+    background-color: var(--color-primary-500);
+    color: var(--color-on-primary);
+    border: 1px solid var(--color-primary-500);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+    .btn-themed:hover {
+        background-color: var(--color-primary-600);
+        border-color: var(--color-primary-600);
+        color: var(--color-on-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+    }
+
+.btn-themed-secondary {
+    background-color: var(--color-secondary-brand);
+    color: var(--color-on-primary);
+    border: 1px solid var(--color-secondary-brand);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+    .btn-themed-secondary:hover {
+        background-color: var(--color-primary-alt);
+        border-color: var(--color-primary-alt);
+        color: var(--color-on-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+    }
+
+/* General form control styling for theme */
+.form-control, .form-select {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+    .form-control:focus, .form-select:focus {
+        background-color: var(--bg-surface);
+        color: var(--text-primary);
+        border-color: var(--color-primary-500);
+        box-shadow: 0 0 0 0.25rem rgba(var(--color-primary-500-rgb), 0.25);
+    }
+
+/* Themed Heading Styles */
+.themed-heading {
+    color: var(--text-primary);
+    border-color: var(--color-primary-500);
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Chart.js specific styling for text and grid lines */
+.chartjs-render-monitor {
+    color: var(--text-primary);
+}
+/*Home Page*/
+.animate-fade-in-down {
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: fadeInDown 1s ease-out forwards;
+}
+
+.animate-fade-in-up {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1s ease-out forwards;
+    animation-delay: 0.3s;
+}
+
+.animate-bounce-once {
+    animation: bounce 1s ease-in-out 3; /* Bounce 3 times */
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 2s infinite ease-in-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-15px);
+    }
+
+    60% {
+        transform: translateY(-7px);
+    }
+}
+
+@keyframes pulse-subtle {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+}
+
+/* Fade-in on scroll effect */
+.module-card, .dashboard-link-card {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.fade-in-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Custom button styling for hero section */
+.btn-themed-hero {
+    background-color: var(--color-accent-500); /* Use a defined accent color */
+    color: var(--text-on-accent); /* Text color for accent background */
+    border: 2px solid var(--color-accent-500);
+    box-shadow: 0 4px 14px rgba(var(--color-accent-500-rgb), 0.4);
+}
+
+    .btn-themed-hero:hover {
+        background-color: var(--color-accent-600);
+        border-color: var(--color-accent-600);
+        box-shadow: 0 6px 20px rgba(var(--color-accent-600-rgb), 0.5);
+    }
+
+/* --- DataTable and Card View Specific Styles (Commented Out for Debugging) --- */
+/*
+.cards-grid-container {
+    gap: 1.5rem;
+    padding: 1rem;
+    background: rgba(var(--glass-bg-base), var(--glass-bg-opacity));
+    border: 1px solid rgba(var(--glass-border-base), var(--glass-border-opacity));
+    backdrop-filter: blur(var(--glass-blur-strength));
+    -webkit-backdrop-filter: blur(var(--glass-blur-strength));
+    box-shadow: var(--glass-shadow-strength);
+}
+
+.data-card {
+    background: rgba(var(--glass-bg-base), var(--glass-bg-opacity));
+    border: 1px solid rgba(var(--glass-border-base), var(--glass-border-opacity));
+    backdrop-filter: blur(var(--glass-blur-strength));
+    -webkit-backdrop-filter: blur(var(--glass-blur-strength));
+    box-shadow: var(--glass-shadow-strength);
+    border-radius: 0.75rem;
+    color: var(--text-primary);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease, color 0.3s ease;
+}
+
+    .data-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--glass-shadow-strength), 0 12px 20px rgba(var(--glass-bg-base), var(--glass-bg-opacity) + 0.1);
+    }
+
+    .data-card .card-item {
+        padding: 0.5rem 1rem;
+        border-bottom: 1px dashed var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .data-card .card-item:last-child {
+            border-bottom: none;
+        }
+
+    .data-card .card-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        padding: 1rem;
+        border-top: 1px solid var(--border-color);
+        margin-top: 1rem;
+    }
+
+.dataTables_wrapper table thead {
+    background-color: var(--table-header-bg);
+    color: var(--table-header-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+    .dataTables_wrapper table thead th {
+        border-color: var(--border-color);
+    }
+
+.dataTables_wrapper table tbody {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+    .dataTables_wrapper table tbody tr {
+        border-bottom: 1px solid var(--border-color);
+    }
+
+        .dataTables_wrapper table tbody tr:hover {
+            background-color: rgba(var(--glass-bg-base), var(--glass-bg-opacity) - 0.2);
+        }
+*/
+
+
+/**Animations*/
+.flip-card {
+    perspective: 1000px;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s cubic-bezier(.23,1.02,.36,1), box-shadow 0.4s cubic-bezier(.23,1.02,.36,1);
+    transform-style: preserve-3d;
+    will-change: transform, box-shadow;
+}
+
+.flip-card:hover .flip-card-inner,
+.flip-card:focus-within .flip-card-inner {
+    transform: rotateY(180deg);
+    box-shadow: 0 12px 32px 0 rgba(50,0,88,0.18), 0 2px 8px 0 rgba(0,0,0,0.08);
+}
+
+.flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 1rem;
+    transition: background 0.5s cubic-bezier(.23,1.02,.36,1), color 0.5s cubic-bezier(.23,1.02,.36,1);
+}
+
+.flip-card-front {
+    background: #fff;
+}
+
+.flip-card-back {
+    background: #f3f4f6;
+    color: #2563eb;
+    transform: rotateY(180deg);
+    padding: 2rem 1rem;
+}

@@ -1,0 +1,355 @@
+﻿@page
+@model MyApp.Namespace.ListAPInvoiceModel
+@{
+    ViewData["Title"] = "AP Invoices";
+}
+
+
+<div class="mx-auto p-4 sm:p-6 lg:p-8 glass-effect rounded-lg h-full overflow-y-auto">
+    <h2 class="text-4xl themed-heading font-extrabold mb-6 border-b-4 pb-2 inline-block">AP Invoices Overview: Financial Health</h2>
+
+    <!-- AP Invoice Summary KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Total Outstanding Amount</h3>
+            <p class="text-4xl font-bold text-red-600 mt-auto">$125,450</p>
+            <span class="text-sm text-gray-500">Across 85 Invoices</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Overdue Invoices</h3>
+            <p class="text-4xl font-bold text-orange-600 mt-auto">12</p>
+            <span class="text-sm text-gray-500">Total: $15,200</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Invoices Pending Approval</h3>
+            <p class="text-4xl font-bold text-yellow-600 mt-auto">5</p>
+            <span class="text-sm text-gray-500">Value: $8,100</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Average Days to Pay</h3>
+            <p class="text-4xl font-bold text-green-600 mt-auto">28 Days</p>
+            <span class="text-sm text-gray-500">Target: 30 Days</span>
+        </div>
+    </div>
+
+    <!-- Filter and Action Buttons -->
+    <div class="mb-8 p-6 glass-effect rounded-xl border shadow-md">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Filter Invoices</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div>
+                <label for="apInvoiceStatusFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                <select id="apInvoiceStatusFilter" class="form-select w-full rounded-md shadow-sm border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Overdue">Overdue</option>
+                    <option value="Void">Void</option>
+                </select>
+            </div>
+            <div>
+                <label for="apInvoiceVendorFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vendor</label>
+                <input type="text" id="apInvoiceVendorFilter" placeholder="Search by vendor name..." class="form-control w-full rounded-md shadow-sm border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            </div>
+            <div>
+                <label for="apInvoiceStartDateFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Invoice Date From</label>
+                <input type="date" id="apInvoiceStartDateFilter" class="form-control w-full rounded-md shadow-sm border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            </div>
+            <div>
+                <label for="apInvoiceEndDateFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Invoice Date To</label>
+                <input type="date" id="apInvoiceEndDateFilter" class="form-control w-full rounded-md shadow-sm border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            </div>
+        </div>
+        <div class="flex flex-wrap gap-4 items-center">
+            <a href="/APInvoices/CreateAPInvoice" class="flex items-center px-6 py-3 btn-themed font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-blue-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                Add New Invoice
+            </a>
+            <button class="flex items-center px-6 py-3 btn-themed-secondary font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                Upload Invoices
+            </button>
+            <button id="toggleViewBtn_apInvoicesTable" class="flex items-center px-6 py-3 btn-themed-secondary font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-green-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Switch to Card View
+            </button>
+            <button id="toggleChartBtn_apInvoicesTable" class="flex items-center px-6 py-3 btn-themed-secondary font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-green-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>
+                Show Chart
+            </button>
+        </div>
+    </div>
+
+    <!-- AP Invoices Table Container -->
+    <div class="mb-8">
+        <h3 class="text-2xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">All AP Invoices</h3>
+        <table id="apInvoicesTable" class="display w-full text-left border-collapse rounded-lg shadow-md" style="width:100%">
+            <thead>
+                <tr>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tl-xl">AP Invoice ID</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Vendor Name</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Invoice Date</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Due Date</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tr-xl">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @* DataTables will populate this tbody *@
+            </tbody>
+        </table>
+
+        <div id="apInvoicesTable-card-view" class="mt-8 cards-grid-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" style="display: none;"></div>
+        <div id="apInvoicesTable-chart-container" style="display: none;">
+            <canvas id="apInvoicesTable-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- AP Invoice Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="data-card glass-effect rounded-xl p-6 border shadow-md">
+            <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Invoice Status Distribution</h3>
+            <div style="height: 300px;">
+                <canvas id="apInvoiceStatusChart"></canvas>
+            </div>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border shadow-md">
+            <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Top 5 Vendors by Invoice Amount</h3>
+            <div style="height: 300px;"> 
+                <canvas id="apInvoiceTopVendorsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- AP Invoice Aging Report Summary (Placeholder) -->
+    <div class="mb-8 p-6 glass-effect rounded-xl border shadow-md">
+        <h3 class="text-2xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Invoice Aging Summary</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+            <div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                <p class="text-lg font-semibold text-blue-800 dark:text-blue-200">Current</p>
+                <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">$80,000</p>
+            </div>
+            <div class="p-4 bg-green-50 dark:bg-green-900 rounded-lg">
+                <p class="text-lg font-semibold text-green-800 dark:text-green-200">1-30 Days Overdue</p>
+                <p class="text-2xl font-bold text-green-600 dark:text-green-400">$10,500</p>
+            </div>
+            <div class="p-4 bg-yellow-50 dark:bg-yellow-900 rounded-lg">
+                <p class="text-lg font-semibold text-yellow-800 dark:text-yellow-200">31-60 Days Overdue</p>
+                <p class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">$3,200</p>
+            </div>
+            <div class="p-4 bg-red-50 dark:bg-red-900 rounded-lg">
+                <p class="text-lg font-semibold text-red-800 dark:text-red-200">60+ Days Overdue</p>
+                <p class="text-2xl font-bold text-red-600 dark:text-red-400">$1,500</p>
+            </div>
+        </div>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-4 text-center">This section provides a quick overview of outstanding invoices by their age. (Data is static for demonstration; integrate with backend for dynamic updates).</p>
+    </div>
+
+</div>
+
+
+@section Scripts {
+    @*
+        Ensure site.js is loaded from _Layout.cshtml.
+        Only include your custom script for this page here.
+    *@
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            const apInvoicesTableId = "apInvoicesTable"; // Changed table ID to be specific for AP Invoices
+
+            LoadDataTable({
+                tableId: apInvoicesTableId,
+                ajaxUrl: "/api/Apinvoices", // Your API endpoint for AP Invoices
+                columns: [
+                    { data: "apinvoiceId", title: "AP Invoice ID" }, // Assuming property name is apinvoiceId
+                    { data: "vendorName", title: "Vendor Name" }, // Assuming Apinvoice has VendorName
+                    {
+                        data: "invoiceDate",
+                        title: "Invoice Date",
+                        render: function (data) {
+                            // Format date for display if needed
+                            if (data) {
+                                return new Date(data).toLocaleDateString(); // Example: MM/DD/YYYY
+                            }
+                            return '';
+                        }
+                    },
+                    {
+                        data: "dueDate",
+                        title: "Due Date",
+                        render: function (data) {
+                            // Format date for display if needed
+                            if (data) {
+                                return new Date(data).toLocaleDateString(); // Example: MM/DD/YYYY
+                            }
+                            return '';
+                        }
+                    },
+                    {
+                        data: "amount",
+                        title: "Amount",
+                        render: function (data) {
+                            // Format amount as currency
+                            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(data);
+                        }
+                    },
+                    { data: "status", title: "Status" },
+                    {
+                        data: null,
+                        title: "Actions",
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row) {
+                            const apinvoiceId = row.apinvoiceId; // Assuming property name is apinvoiceId
+                            return `
+                                <a href="/APInvoices/EditAPInvoice/${apinvoiceId}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200 mr-2">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    Edit
+                                </a>
+                                <a href="/APInvoices/Delete/${apinvoiceId}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200" onclick="return confirm('Are you sure you want to delete this AP Invoice?');">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    Delete
+                                </a>
+                            `;
+                        }
+                    }
+                ],
+                pageLength: 10,
+                initialIsCardView: false,
+                initialIsChartView: false,
+                chartConfig: {
+                    type: 'line', // Line chart for trends over time
+                    processData: function (apiData, columns) {
+                        console.log("Processing data for AP Invoice line chart:", apiData);
+
+                        // Sort data by InvoiceDate to ensure the line chart is chronological
+                        apiData.sort((a, b) => new Date(a.invoiceDate) - new Date(b.invoiceDate));
+
+                        const labels = apiData.map(item => new Date(item.invoiceDate).toLocaleDateString()); // X-axis labels: Formatted Invoice Date
+
+                        // Create structured data points to include status for tooltips
+                        const dataPoints = apiData.map(item => ({
+                            x: new Date(item.invoiceDate).toLocaleDateString(), // X-axis value
+                            y: item.amount,                                   // Y-axis value
+                            status: item.status                               // Custom property for tooltip
+                        }));
+
+                        return {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Invoice Amount',
+                                data: dataPoints,
+                                borderColor: 'rgba(255, 99, 132, 1)', // Reddish color for invoices
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderWidth: 2,
+                                pointRadius: 6,
+                                pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                                pointBorderColor: '#fff',
+                                pointHoverRadius: 8,
+                                pointHoverBackgroundColor: 'rgba(255, 99, 132, 1)',
+                                pointHoverBorderColor: 'rgba(220,220,220,1)',
+                                tension: 0.4 // Smooth line
+                            }]
+                        };
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Amount ($)',
+                                    font: { size: 14, family: 'Inter, sans-serif' }
+                                },
+                                grid: {
+                                    color: 'rgba(200, 200, 200, 0.2)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Invoice Date',
+                                    font: { size: 14, family: 'Inter, sans-serif' }
+                                },
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    font: {
+                                        family: 'Inter, sans-serif'
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'AP Invoice Amounts Over Time',
+                                font: { size: 20, family: 'Inter, sans-serif', weight: 'bold' },
+                                color: '#333'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    font: { family: 'Inter, sans-serif' }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                        }
+                                        return label;
+                                    },
+                                    afterLabel: function(context) {
+                                        const status = context.raw ? context.raw.status : null;
+                                        return status ? `Status: ${status}` : '';
+                                    }
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeOutQuart'
+                        },
+                        font: {
+                            family: 'Inter, sans-serif'
+                        }
+                    }
+                }
+            });
+
+            // Event listener for the table/card toggle button
+            $(`#toggleViewBtn_${apInvoicesTableId}`).on('click', function () {
+                toggleTableView(apInvoicesTableId);
+                const $btn = $(this);
+                const instanceState = dataTableManager[apInvoicesTableId];
+                if (instanceState.isCardView) {
+                    $btn.html('<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>Switch to Table View');
+                } else {
+                    $btn.html('<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>Switch to Card View');
+                }
+            });
+
+            // Event listener for the chart toggle button
+            $(`#toggleChartBtn_${apInvoicesTableId}`).on('click', function () {
+                toggleChartView(apInvoicesTableId);
+                const $btn = $(this);
+                const instanceState = dataTableManager[apInvoicesTableId];
+                 if (instanceState.isChartView) {
+                    $btn.html('<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v10zm12 0V7m0 10a2 2 0 01-2 2h-2a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v10zm-6 0V7m0 10a2 2 0 01-2 2h-2a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v10z"></path></svg>Show Table/Card');
+                } else {
+                    $btn.html('<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>Show Chart');
+                }
+            });
+        });
+    </script>
+}

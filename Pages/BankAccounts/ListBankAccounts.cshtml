@@ -1,0 +1,329 @@
+﻿@page
+@model MyApp.Namespace.ListBankAccountsModel
+@{
+    ViewData["Title"] = "Bank Accounts";
+}
+<div class="mx-auto p-4 sm:p-6 lg:p-8 glass-effect rounded-lg h-full overflow-y-auto">
+    <h2 class="text-4xl themed-heading font-extrabold mb-6 border-b-4 pb-2 inline-block">Bank Accounts Overview</h2>
+
+    <!-- Bank Account Summary KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Total Balance Across All Accounts</h3>
+            <p class="text-4xl font-bold text-blue-600 mt-auto" id="kpiTotalBalance">$0.00</p>
+            <span class="text-sm text-gray-500">Combined funds available</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Number of Active Accounts</h3>
+            <p class="text-4xl font-bold text-green-600 mt-auto" id="kpiActiveAccounts">0</p>
+            <span class="text-sm text-gray-500">Currently operational accounts</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Largest Single Balance</h3>
+            <p class="text-4xl font-bold text-purple-600 mt-auto" id="kpiLargestBalance">$0.00</p>
+            <span class="text-sm text-gray-500">Highest balance in one account</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Accounts with Low Balance</h3>
+            <p class="text-4xl font-bold text-orange-600 mt-auto" id="kpiLowBalanceAccounts">0</p>
+            <span class="text-sm text-gray-500">Accounts below threshold (e.g., $1,000)</span>
+        </div>
+    </div>
+
+    <!-- Filter and Action Buttons -->
+    <div class="mb-8 p-6 glass-effect rounded-xl border shadow-md">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Filter Bank Accounts</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div>
+                <label for="bankNameFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bank Name</label>
+                <input type="text" id="bankNameFilter" placeholder="Search by bank name..." class="form-control w-full rounded-md shadow-sm border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            </div>
+            <div>
+                <label for="accountTypeFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Account Type</label>
+                <select id="accountTypeFilter" class="form-select w-full rounded-md shadow-sm border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                    <option value="">All Types</option>
+                    <option value="Checking">Checking</option>
+                    <option value="Savings">Savings</option>
+                    <option value="Credit Card">Credit Card</option>
+                    <option value="Investment">Investment</option>
+                </select>
+            </div>
+            <div>
+                <label for="currencyFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Currency</label>
+                <select id="currencyFilter" class="form-select w-full rounded-md shadow-sm border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                    <option value="">All Currencies</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                    <option value="JPY">JPY</option>
+                </select>
+            </div>
+            <div>
+                <label for="minBalanceFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Min Balance</label>
+                <input type="number" id="minBalanceFilter" placeholder="Min. balance" class="form-control w-full rounded-md shadow-sm border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            </div>
+        </div>
+        <div class="flex flex-wrap gap-4 items-center">
+            <a href="/BankAccounts/Create" class="flex items-center px-6 py-3 btn-themed font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-blue-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                Add New Account
+            </a>
+            <button class="flex items-center px-6 py-3 btn-themed-secondary font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                Reconcile Accounts
+            </button>
+            <button class="flex items-center px-6 py-3 btn-themed-secondary font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-yellow-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                Generate Statement
+            </button>
+            <button id="toggleViewBtn_bankAccountsTable" class="flex items-center px-6 py-3 btn-themed-secondary font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-green-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Switch to Card View
+            </button>
+            <button id="toggleChartBtn_bankAccountsTable" class="flex items-center px-6 py-3 btn-themed-secondary font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-green-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v10zm12 0a2 2 0 01-2 2h-2a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v10zm-7 0a2 2 0 01-2 2h-2a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v10z"></path></svg>
+                Show Chart
+            </button>
+            <button class="flex items-center px-6 py-3 btn-themed-secondary font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-green-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Export Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Bank Accounts Table Container -->
+    <div class="mb-8">
+        <h3 class="text-2xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">All Bank Accounts</h3>
+        <table id="bankAccountsTable" class="display w-full text-left border-collapse rounded-lg shadow-md" style="width:100%">
+            <thead>
+                <tr>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tl-xl">Bank ID</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Account Name</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Account Number</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Bank Name</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Account Type</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Currency</th>
+                </tr>
+            </thead>
+            <tbody>
+                @* DataTables will populate this tbody *@
+            </tbody>
+        </table>
+
+        <div id="bankAccountsTable-card-view" class="mt-8 cards-grid-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" style="display: none;"></div>
+        <div id="bankAccountsTable-chart-container" style="display: none;">
+            <canvas id="bankAccountsTable-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- Bank Accounts Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="data-card glass-effect rounded-xl p-6 border shadow-md">
+            <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Total Balance by Bank</h3>
+            <div style="height: 300px;">
+
+                <canvas id="bankBalanceByBankChart"></canvas>
+            </div>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border shadow-md">
+            <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Account Type Distribution</h3>
+            <div style="height: 300px;"> 
+                <canvas id="bankAccountTypeDistributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-card glass-effect rounded-xl p-6 border shadow-md mb-8">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Balance Trend (Last 12 Months)</h3>
+        <div style="height: 350px;">
+            <canvas id="bankBalanceTrendChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bank Account Details Modal -->
+<div id="bankAccountDetailsModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-1/3 flex flex-col p-6 glass-effect border">
+        <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-4">
+            <h3 id="bankAccountModalTitle" class="text-2xl font-bold text-primary">Bank Account Details</h3>
+            <button id="closeBankAccountDetailsModalBtn" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div id="bankAccountDetailsContent" class="text-gray-700 space-y-3 overflow-y-auto max-h-[70vh]">
+            <p><strong>Bank Account ID:</strong> <span id="modalBankAccountId"></span></p>
+            <p><strong>Account Name:</strong> <span id="modalAccountName"></span></p>
+            <p><strong>Bank Name:</strong> <span id="modalBankName"></span></p>
+            <p><strong>Account Number:</strong> <span id="modalAccountNumber"></span></p>
+            <p><strong>Account Type:</strong> <span id="modalAccountType"></span></p>
+            <p><strong>Currency:</strong> <span id="modalCurrency"></span></p>
+            <p><strong>Current Balance:</strong> <span id="modalBalance"></span></p>
+            <p class="text-sm text-gray-500 mt-4">Additional transaction history, statements, and reconciliation status can be displayed here.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @*
+        Ensure site.js is loaded from _Layout.cshtml.
+        Only include your custom script for this page here.
+    *@
+    <script>
+        $(document).ready(function () {
+            const bankAccountsTableId = "bankAccountsTable";
+
+            LoadDataTable({
+                tableId: bankAccountsTableId,
+                ajaxUrl: "/api/BankAccounts",
+                columns: [
+                    { data: "bankAccountId", title: "Bank Account ID" },
+                    { data: "accountName", title: "Account Name" },
+                    { data: "accountNumber", title: "Account Number" },
+                    { data: "bankName", title: "Bank Name" },
+                    { data: "balance", title: "Balance", render: $.fn.dataTable.render.number(',', '.', 2, '$') },
+                    {
+                        data: null,
+                        title: "Actions",
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row) {
+                            const id = row.bankAccountId;
+                            return `
+                                <a href="/BankAccounts/Edit/${id}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200 mr-2">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    Edit
+                                </a>
+                                <a href="/BankAccounts/Delete/${id}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200" onclick="return confirm('Are you sure you want to delete this Bank Account?');">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    Delete
+                                </a>
+                            `;
+                        }
+                    }
+                ],
+                pageLength: 10,
+                initialIsCardView: false,
+                initialIsChartView: false,
+                cardViewRender: function (data) {
+                    return `
+                        <div class="data-card glass-effect rounded-xl p-6 border hover:shadow-xl transition-shadow duration-300">
+                            <h3 class="text-xl font-bold text-blue-700 mb-2">${data.accountName}</h3>
+                            <div class="card-item"><strong>ID:</strong> <span>${data.bankAccountId}</span></div>
+                            <div class="card-item"><strong>Bank:</strong> <span>${data.bankName || 'N/A'}</span></div>
+                            <div class="card-item"><strong>Account No.:</strong> <span>${data.accountNumber || 'N/A'}</span></div>
+                            <div class="card-item"><strong>Balance:</strong> <span>${$.fn.dataTable.render.number(',', '.', 2, '$').display(data.balance)}</span></div>
+                            <div class="card-actions">
+                                <a href="/BankAccounts/Edit/${data.bankAccountId}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg> Edit
+                                </a>
+                                <a href="/BankAccounts/Delete/${data.bankAccountId}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200" onclick="return confirm('Are you sure you want to delete this Bank Account?');">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg> Delete
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                },
+                chartConfig: {
+                    type: 'doughnut',
+                    processData: function (apiData, columns) {
+                        // Group balances by bank name for chart
+                        const bankBalances = {};
+                        apiData.forEach(item => {
+                            const bank = item.bankName || 'Unknown';
+                            bankBalances[bank] = (bankBalances[bank] || 0) + (item.balance || 0);
+                        });
+                        const labels = Object.keys(bankBalances);
+                        const dataValues = labels.map(label => bankBalances[label]);
+                        return {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Total Balance by Bank',
+                                data: dataValues,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.6)',
+                                    'rgba(54, 162, 235, 0.6)',
+                                    'rgba(255, 206, 86, 0.6)',
+                                    'rgba(75, 192, 192, 0.6)',
+                                    'rgba(153, 102, 255, 0.6)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        };
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Bank Account Balances by Bank',
+                                font: { size: 20, family: 'Inter, sans-serif', weight: 'bold' },
+                                color: '#333'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    font: { family: 'Inter, sans-serif' }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeOutQuart'
+                        },
+                        font: {
+                            family: 'Inter, sans-serif'
+                        }
+                    }
+                }
+            });
+
+            // Table/Card toggle button
+            $(`#toggleViewBtn_${bankAccountsTableId}`).on('click', function () {
+                toggleTableView(bankAccountsTableId);
+                const $btn = $(this);
+                const instanceState = dataTableManager[bankAccountsTableId];
+                if (instanceState.isCardView) {
+                    $btn.html('<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>Switch to Table View');
+                } else {
+                    $btn.html('<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>Switch to Card View');
+                }
+            });
+
+            // Chart toggle button
+            $(`#toggleChartBtn_${bankAccountsTableId}`).on('click', function () {
+                toggleChartView(bankAccountsTableId);
+                const $btn = $(this);
+                const instanceState = dataTableManager[bankAccountsTableId];
+                if (instanceState.isChartView) {
+                    $btn.html('<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v10zm12 0V7m0 10a2 2 0 01-2 2h-2a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v10zm-6 0V7m0 10a2 2 0 01-2 2h-2a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v10z"></path></svg>Show Table/Card');
+                } else {
+                    $btn.html('<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>Show Chart');
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,1129 @@
+﻿@page
+@model MyApp.Namespace.FinanceModel
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Financial Management Dashboard";
+
+}
+<div class="mx-auto p-4 sm:p-6 lg:p-8 glass-effect rounded-lg h-full overflow-y-auto">
+    <h2 class="text-4xl themed-heading font-extrabold mb-6 border-b-4 pb-2 inline-block">Financial Management Dashboard</h2>
+
+    <!-- Key Financial KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Current Cash Balance</h3>
+            <p class="text-4xl font-bold text-blue-600 mt-auto" id="kpiCashBalance">$0.00</p>
+            <span class="text-sm text-gray-500">Across all bank accounts</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Accounts Receivable (AR)</h3>
+            <p class="text-4xl font-bold text-green-600 mt-auto" id="kpiARBalance">$0.00</p>
+            <span class="text-sm text-gray-500">Total outstanding invoices</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Accounts Payable (AP)</h3>
+            <p class="text-4xl font-bold text-red-600 mt-auto" id="kpiAPBalance">$0.00</p>
+            <span class="text-sm text-gray-500">Total outstanding bills</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Available Discounts</h3>
+            <p class="text-4xl font-bold text-purple-600 mt-auto" id="kpiAvailableDiscounts">$0.00</p>
+            <span class="text-sm text-gray-500">Potential savings from early payments</span>
+        </div>
+    </div>
+
+    <!-- Predictive Cash Flow Navigator -->
+    <div class="data-card glass-effect rounded-xl p-6 border shadow-md mb-8">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Predictive Cash Flow Navigator</h3>
+        <p class="text-secondary mb-4">Visualize historical and forecasted cash balances to anticipate future liquidity needs.</p>
+        <div style="height: 350px;">
+            <canvas id="cashFlowChart"></canvas>
+        </div>
+        <div class="mt-4 text-sm text-gray-600">
+            <p><strong>Insight:</strong> Projected cash balance remains positive for the next 3 months, but closely monitor large upcoming AP payments in August.</p>
+            <p><strong>Recommendation:</strong> Consider optimizing payment terms for key vendors or exploring short-term credit lines if cash flow tightens.</p>
+        </div>
+    </div>
+
+    <!-- Material Cost Forecast -->
+    <div class="data-card glass-effect rounded-xl p-6 border shadow-md mb-8">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Material Cost Forecast</h3>
+        <p class="text-secondary mb-4">Projected future material expenditures based on historical trends.</p>
+        <div style="height: 350px;">
+            <canvas id="materialCostChart"></canvas>
+        </div>
+        <div class="mt-4 text-sm text-gray-600">
+            <p><strong>Insight:</strong> Material costs are projected to slightly increase over the next quarter, indicating potential supply chain pressures.</p>
+            <p><strong>Recommendation:</strong> Explore alternative suppliers or negotiate new bulk purchasing agreements to mitigate rising costs.</p>
+        </div>
+    </div>
+
+    <!-- Equipment Cost Forecast -->
+    <div class="data-card glass-effect rounded-xl p-6 border shadow-md mb-8">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Equipment Cost Forecast</h3>
+        <p class="text-secondary mb-4">Projected future equipment-related expenditures, including maintenance and potential upgrades.</p>
+        <div style="height: 350px;">
+            <canvas id="equipmentCostChart"></canvas>
+        </div>
+        <div class="mt-4 text-sm text-gray-600">
+            <p><strong>Insight:</strong> Equipment costs show a stable trend, but a slight increase is forecasted for the end of the year, possibly due to scheduled maintenance.</p>
+            <p><strong>Recommendation:</strong> Plan for equipment servicing budgets in advance and consider preventative maintenance to avoid unexpected large expenses.</p>
+        </div>
+    </div>
+
+    <!-- What-If Scenario Analyzer -->
+    <div class="mb-8 p-6 glass-effect rounded-xl border shadow-md">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">What-If Scenario Analyzer: Cost Reduction</h3>
+        <p class="text-secondary mb-4">Simulate the impact of cost reductions on your future financial outlook.</p>
+
+        <div class="flex flex-col sm:flex-row gap-4 mb-6 items-center">
+            <div class="w-full sm:w-1/3">
+                <label for="costTypeSelect" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cost Type:</label>
+                <select id="costTypeSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
+                    <option value="MaterialCost">Material Cost</option>
+                    <option value="EquipmentCost">Equipment Cost</option>
+                    <!-- Add more cost types as needed -->
+                </select>
+            </div>
+            <div class="w-full sm:w-1/3">
+                <label for="reductionPercentageInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reduction Percentage (%):</label>
+                <input type="number" id="reductionPercentageInput" value="20" min="1" max="99" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm" />
+            </div>
+            <div class="w-full sm:w-1/3 flex items-end">
+                <button id="runWhatIfScenarioBtn" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                    Run Scenario
+                </button>
+            </div>
+        </div>
+
+        <div id="whatIfResults" class="mt-6">
+            <h4 class="text-lg font-bold text-primary mb-3">Scenario Results: <span id="scenarioDescription"></span></h4>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse rounded-lg shadow-sm">
+                    <thead>
+                        <tr class="bg-gray-100 dark:bg-gray-800">
+                            <th class="px-4 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider rounded-tl-lg">Month</th>
+                            <th class="px-4 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider">Original Cost</th>
+                            <th class="px-4 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider">Adjusted Cost</th>
+                            <th class="px-4 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider">Original Net Profit</th>
+                            <th class="px-4 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider">Adjusted Net Profit</th>
+                            <th class="px-4 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider rounded-tr-lg">Adjusted Cash Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="whatIfResultsTableBody">
+                        <tr><td colspan="6" class="text-center text-gray-500 py-4">Run a scenario to see results.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Smart AP Discount Maximizer Section -->
+    <div class="mb-8 p-6 glass-effect rounded-xl border shadow-md">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Smart AP Discount Maximizer</h3>
+        <p class="text-secondary mb-4">Identify and prioritize Accounts Payable invoices with early payment discount opportunities. Click on an invoice below for more details.</p>
+
+        <div id="apDiscountOpportunities" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Discount opportunity cards will be loaded here by JavaScript -->
+            <div class="col-span-full text-center text-gray-500" id="noDiscountOpportunities">
+                No immediate early payment discount opportunities found.
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic AR Collection Assistant Section -->
+    <div class="mb-8 p-6 glass-effect rounded-xl border shadow-md">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Dynamic AR Collection Assistant</h3>
+        <p class="text-secondary mb-4">Prioritized list of overdue Accounts Receivable invoices requiring immediate attention.</p>
+
+        <div id="arOverdueInvoices" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Overdue AR invoice cards will be loaded here by JavaScript -->
+            <div class="col-span-full text-center text-gray-500" id="noOverdueARInvoices">
+                No overdue Accounts Receivable invoices found.
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Financial Storyteller (Simplified Income Statement Overview) -->
+    <div class="mb-8 p-6 glass-effect rounded-xl border shadow-md">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Consolidated Financial Overview (YTD)</h3>
+        <p class="text-secondary mb-4">A high-level summary of key financial performance metrics. Click on a row for more details (conceptual drill-down).</p>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse rounded-lg shadow-sm">
+                <thead>
+                    <tr class="bg-gray-100 dark:bg-gray-800">
+                        <th class="px-4 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider rounded-tl-lg">Metric</th>
+                        <th class="px-4 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider">Current YTD</th>
+                        <th class="px-4 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider">Previous YTD</th>
+                        <th class="px-4 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider rounded-tr-lg">Change (%)</th>
+                    </tr>
+                </thead>
+                <tbody id="financialSummaryTableBody">
+                    <!-- Data will be populated by JavaScript -->
+                    <tr><td colspan="4" class="text-center text-gray-500 py-4">Loading financial data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Adaptive Budget vs. Actual Analyzer -->
+    <div class="data-card glass-effect rounded-xl p-6 border shadow-md mb-8">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Budget vs. Actual Performance (Net Profit)</h3>
+        <p class="text-secondary mb-4">Compare actual financial performance against budgeted targets to identify variances.</p>
+        <div style="height: 350px;">
+            <canvas id="budgetVsActualChart"></canvas>
+        </div>
+        <div class="mt-4 text-sm text-gray-600">
+            <p><strong>Insight:</strong> Actual net profit is slightly below budget for Q2, primarily due to unexpected operational expenses.</p>
+            <p><strong>Recommendation:</strong> Review expense categories for potential cost-cutting measures or adjust Q3 budget forecasts.</p>
+        </div>
+    </div>
+
+    <!-- Project Profitability Overview -->
+    <div class="mb-8 p-6 glass-effect rounded-xl border shadow-md">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Project Profitability Overview</h3>
+        <p class="text-secondary mb-4">Quick glance at the financial health of your active projects.</p>
+        <div id="projectProfitabilityCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Project profitability cards will be loaded here by JavaScript -->
+            <div class="col-span-full text-center text-gray-500" id="noProjectsFound">
+                No active projects to display profitability.
+            </div>
+        </div>
+    </div>
+
+    <!-- Automated Liquidity Alerts Placeholder -->
+    <div class="mb-8 p-6 glass-effect rounded-xl border border-yellow-300 bg-yellow-50 shadow-md">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block text-yellow-800">Automated Liquidity Alerts (Feature Concept)</h3>
+        <p class="text-yellow-700">
+            This feature would proactively notify you of potential cash flow shortfalls based on forecasted financial data,
+            allowing you to take corrective actions before liquidity issues arise. Alerts can be configured for email, SMS, or in-app notifications.
+        </p>
+    </div>
+
+    <!-- AP Aging Chart -->
+    <div class="data-card glass-effect rounded-xl p-6 border shadow-md mb-8">
+        <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Accounts Payable Aging</h3>
+        <div style="height: 350px;">
+            <canvas id="apAgingChart"></canvas>
+        </div>
+    </div>
+
+    <!-- All AP Invoices Table -->
+    <div class="mb-8">
+        <h3 class="text-2xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">All Accounts Payable Invoices</h3>
+        <table id="apInvoicesTable" class="display w-full text-left border-collapse rounded-lg shadow-md" style="width:100%">
+            <thead>
+                <tr>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tl-xl">Invoice ID</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Vendor</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Invoice Date</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Due Date</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Discount Available</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Discount Due Date</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tr-xl">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- DataTables will populate this tbody -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Invoice Details Modal (for AP Invoices) -->
+    <div id="apInvoiceDetailsModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-1/2 flex flex-col p-6 glass-effect border">
+            <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-4">
+                <h3 id="modalInvoiceTitle" class="text-2xl font-bold text-primary">Invoice Details</h3>
+                <button id="closeApInvoiceDetailsModalBtn" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modalInvoiceContent" class="text-gray-700 space-y-3 overflow-y-auto max-h-[70vh]">
+                <p><strong>Invoice ID:</strong> <span id="modalInvoiceId"></span></p>
+                <p><strong>Vendor:</strong> <span id="modalVendorName"></span></p>
+                <p><strong>Invoice Date:</strong> <span id="modalInvoiceDate"></span></p>
+                <p><strong>Due Date:</strong> <span id="modalDueDate"></span></p>
+                <p><strong>Amount:</strong> <span id="modalAmount"></span></p>
+                <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+                <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+                <p class="text-lg font-semibold mt-4">Discount Information:</p>
+                <p><strong>Discount Available:</strong> <span id="modalDiscountAvailable"></span></p>
+                <p><strong>Discount Due Date:</strong> <span id="modalDiscountDueDate"></span></p>
+                <p class="text-sm text-gray-500 mt-4">Further details like payment history, associated purchase orders, and journal entries can be integrated here.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AR Invoice Details Modal -->
+    <div id="arInvoiceDetailsModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-1/2 flex flex-col p-6 glass-effect border">
+            <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-4">
+                <h3 id="modalArInvoiceTitle" class="text-2xl font-bold text-primary">AR Invoice Details</h3>
+                <button id="closeArInvoiceDetailsModalBtn" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modalArInvoiceContent" class="text-gray-700 space-y-3 overflow-y-auto max-h-[70vh]">
+                <p><strong>Invoice ID:</strong> <span id="modalArInvoiceId"></span></p>
+                <p><strong>Customer:</strong> <span id="modalCustomerName"></span></p>
+                <p><strong>Invoice Date:</strong> <span id="modalArInvoiceDate"></span></p>
+                <p><strong>Due Date:</strong> <span id="modalArDueDate"></span></p>
+                <p><strong>Amount:</strong> <span id="modalArAmount"></span></p>
+                <p><strong>Status:</strong> <span id="modalArStatus"></span></p>
+                <p><strong>Description:</strong> <span id="modalArDescription"></span></p>
+                <p class="text-sm text-gray-500 mt-4">Further details like payment history and associated sales orders can be integrated here.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Details Modal -->
+    <div id="projectDetailsModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-1/2 flex flex-col p-6 glass-effect border">
+            <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-4">
+                <h3 id="modalProjectTitle" class="text-2xl font-bold text-primary">Project Details</h3>
+                <button id="closeProjectDetailsModalBtn" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modalProjectContent" class="text-gray-700 space-y-3 overflow-y-auto max-h-[70vh]">
+                <p><strong>Project Name:</strong> <span id="modalProjectName"></span></p>
+                <p><strong>Project ID:</strong> <span id="modalProjectId"></span></p>
+                <p><strong>Start Date:</strong> <span id="modalProjectStartDate"></span></p>
+                <p><strong>End Date:</strong> <span id="modalProjectEndDate"></span></p>
+                <p><strong>Budget:</strong> <span id="modalProjectBudget"></span></p>
+                <p><strong>Actual Cost:</strong> <span id="modalProjectActualCost"></span></p>
+                <p><strong>Revenue:</strong> <span id="modalProjectRevenue"></span></p>
+                <p><strong>Profit/Loss:</strong> <span id="modalProjectProfit"></span></p>
+                <p><strong>Status:</strong> <span id="modalProjectStatus"></span></p>
+                <p class="text-sm text-gray-500 mt-4">Further details like tasks, resources, and detailed financial breakdown can be integrated here.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        // --- Dummy Data (Simulating API Responses) ---
+
+
+        // Dummy Data for Financial KPIs
+        const financialKpiData = {
+            cashBalance: 0.00,
+            arBalance: 0.00,
+            apBalance: 0.00,
+            availableDiscounts: 0.00
+        };
+
+        // Dummy Data for AP Invoices (simulating /api/Apinvoices)
+        const apInvoicesData = [
+            { apinvoiceId: 1, vendorId: 101, invoiceDate: "2024-07-01", dueDate: "2024-07-31", amount: 150.00, status: "Outstanding", description: "Monthly office supplies", discountAvailable: 7.50, discountDueDate: "2024-07-15" },
+            { apinvoiceId: 2, vendorId: 102, invoiceDate: "2024-07-05", dueDate: "2024-08-04", amount: 1200.00, status: "Outstanding", description: "Batch A materials", discountAvailable: null, discountDueDate: null },
+            { apinvoiceId: 3, vendorId: 103, invoiceDate: "2024-07-08", dueDate: "2024-07-23", amount: 300.00, status: "Outstanding", description: "Electricity bill", discountAvailable: 3.00, discountDueDate: "2024-07-18" },
+            { apinvoiceId: 4, vendorId: 101, invoiceDate: "2024-06-20", dueDate: "2024-07-20", amount: 80.00, status: "Paid", description: "Printer ink", discountAvailable: null, discountDueDate: null },
+            { apinvoiceId: 5, vendorId: 104, invoiceDate: "2024-07-10", dueDate: "2024-08-09", amount: 2500.00, status: "Outstanding", description: "Electronic components", discountAvailable: 50.00, discountDueDate: "2024-07-25" },
+            { apinvoiceId: 6, vendorId: 102, invoiceDate: "2024-06-01", dueDate: "2024-07-01", amount: 900.00, status: "Overdue", description: "Batch B materials", discountAvailable: null, discountDueDate: null },
+            { apinvoiceId: 7, vendorId: 105, invoiceDate: "2024-07-12", dueDate: "2024-08-11", amount: 750.00, status: "Outstanding", description: "Q3 marketing campaign", discountAvailable: 15.00, discountDueDate: "2024-07-27" },
+            { apinvoiceId: 8, vendorId: 103, invoiceDate: "2024-06-15", dueDate: "2024-07-15", amount: 280.00, status: "Paid", description: "Water bill", discountAvailable: null, discountDueDate: null },
+        ];
+
+        // Dummy Data for AR Invoices (simulating /api/Arinvoices)
+        const arInvoicesData = [
+            { arinvoiceId: 101, customerId: 201, customerName: "Global Corp", invoiceDate: "2024-06-10", dueDate: "2024-07-10", amount: 5000.00, status: "Overdue", description: "Software License Q2" },
+            { arinvoiceId: 102, customerId: 202, customerName: "Local Biz", invoiceDate: "2024-07-01", dueDate: "2024-07-31", amount: 750.00, status: "Outstanding", description: "Consulting Services" },
+            { arinvoiceId: 103, customerId: 201, customerName: "Global Corp", invoiceDate: "2024-05-15", dueDate: "2024-06-15", amount: 2000.00, status: "Overdue", description: "Hardware Purchase" },
+            { arinvoiceId: 104, customerId: 203, customerName: "New Ventures", invoiceDate: "2024-07-05", dueDate: "2024-08-04", amount: 1500.00, status: "Outstanding", description: "Training Workshop" },
+            { arinvoiceId: 105, customerId: 204, customerName: "Innovate Solutions", invoiceDate: "2024-04-20", dueDate: "2024-05-20", amount: 3500.00, status: "Overdue", description: "Project Milestone 1" },
+        ];
+
+        // Dummy Data for Financial Snapshots (simulating /api/FinancialSnapshots)
+        const financialSnapshotsData = [
+            { snapshotDate: "2024-01-31", totalRevenue: 100000, totalExpenses: 70000, netProfit: 30000, cashBalance: 450000, accountsReceivableBalance: 120000, accountsPayableBalance: 50000, payrollCost: 20000, equipmentCost: 5000, materialCost: 10000 },
+            { snapshotDate: "2024-02-29", totalRevenue: 110000, totalExpenses: 72000, netProfit: 38000, cashBalance: 470000, accountsReceivableBalance: 130000, accountsPayableBalance: 55000, payrollCost: 21000, equipmentCost: 5200, materialCost: 11000 },
+            { snapshotDate: "2024-03-31", totalRevenue: 120000, totalExpenses: 75000, netProfit: 45000, cashBalance: 490000, accountsReceivableBalance: 140000, accountsPayableBalance: 60000, payrollCost: 22000, equipmentCost: 5500, materialCost: 12000 },
+            { snapshotDate: "2024-04-30", totalRevenue: 115000, totalExpenses: 73000, netProfit: 42000, cashBalance: 480000, accountsReceivableBalance: 135000, accountsPayableBalance: 58000, payrollCost: 21500, equipmentCost: 5300, materialCost: 11500 },
+            { snapshotDate: "2024-05-31", totalRevenue: 130000, totalExpenses: 80000, netProfit: 50000, cashBalance: 510000, accountsReceivableBalance: 145000, accountsPayableBalance: 62000, payrollCost: 23000, equipmentCost: 5700, materialCost: 13000 },
+            { snapshotDate: "2024-06-30", totalRevenue: 125000, totalExpenses: 78000, netProfit: 47000, cashBalance: 500000, accountsReceivableBalance: 150000, accountsPayableBalance: 60000, payrollCost: 22500, equipmentCost: 5600, materialCost: 12500 },
+            { snapshotDate: "2024-07-31", totalRevenue: 135000, totalExpenses: 82000, netProfit: 53000, cashBalance: 520000, accountsReceivableBalance: 155000, accountsPayableBalance: 65000, payrollCost: 23500, equipmentCost: 5800, materialCost: 13500 }
+        ];
+
+        // Dummy Data for Projects (simulating /api/Projects and /api/ProjectFinancialSummary)
+        const projectsData = [
+            { projectId: 1, projectName: "ERP System Upgrade", startDate: "2024-01-01", endDate: "2024-12-31", budget: 100000, actualCost: 75000, revenue: 0, status: "In Progress", description: "Upgrade core ERP modules." },
+            { projectId: 2, projectName: "New Product Launch", startDate: "2024-03-15", endDate: "2024-09-30", budget: 50000, actualCost: 40000, revenue: 65000, status: "In Progress", description: "Launch innovative new product." },
+            { projectId: 3, projectName: "Warehouse Automation", startDate: "2023-10-01", endDate: "2024-07-31", budget: 75000, actualCost: 70000, revenue: 0, status: "Completed", description: "Automate warehouse logistics." },
+            { projectId: 4, projectName: "Client X Customization", startDate: "2024-06-01", endDate: "2024-08-31", budget: 20000, actualCost: 15000, revenue: 28000, status: "In Progress", description: "Tailored solution for Client X." },
+        ];
+
+
+        // --- Chart Instances ---
+        let apAgingChartInstance = null;
+        let cashFlowChartInstance = null;
+        let materialCostChartInstance = null; // New chart instance
+        let equipmentCostChartInstance = null; // New chart instance
+        let budgetVsActualChartInstance = null;
+
+        // --- Helper Functions ---
+
+        // Function to update KPI cards
+        function updateFinancialKpiCards() {
+            // Using a dummy value for cash balance for now, will be updated by actual snapshots later
+            $('#kpiCashBalance').text(new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(financialKpiData.cashBalance));
+            $('#kpiARBalance').text(new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(financialKpiData.arBalance));
+            $('#kpiAPBalance').text(new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(financialKpiData.apBalance));
+            $('#kpiAvailableDiscounts').text(new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(financialKpiData.availableDiscounts));
+        }
+
+        // Function to render AP Discount Opportunities
+        function renderApDiscountOpportunities(invoices) {
+            const $container = $('#apDiscountOpportunities');
+            $container.empty();
+            let opportunitiesFound = false;
+
+            const today = new Date();
+
+            invoices.forEach(invoice => {
+                if (invoice.discountAvailable && invoice.discountDueDate) {
+                    const discountDueDate = new Date(invoice.discountDueDate);
+                    // Only show if discount due date is in the future or today and invoice is outstanding
+                    if (discountDueDate >= today && invoice.status === "Outstanding") {
+                        opportunitiesFound = true;
+                        const daysRemaining = Math.ceil((discountDueDate - today) / (1000 * 60 * 60 * 24));
+                        $container.append(`
+                            <div class="glass-effect rounded-xl p-4 border border-opacity-30 shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer" onclick="openApInvoiceDetailsModal(${JSON.stringify(invoice).replace(/"/g, '&quot;')})">
+                                <h4 class="text-lg font-bold text-primary">${invoice.vendorName} (Inv #${invoice.apinvoiceId})</h4>
+                                <p class="text-secondary">Discount: <span class="font-semibold text-green-600">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(invoice.discountAvailable)}</span></p>
+                                <p class="text-secondary">Pay by: <span class="font-semibold text-orange-600">${discountDueDate.toLocaleDateString()}</span> (${daysRemaining} days left)</p>
+                            </div>
+                        `);
+                    }
+                }
+            });
+
+            if (!opportunitiesFound) {
+                $container.html('<div class="col-span-full text-center text-gray-500">No immediate early payment discount opportunities found.</div>');
+            }
+        }
+
+        // Function to render Overdue AR Invoices
+        function renderArOverdueInvoices(invoices) {
+            const $container = $('#arOverdueInvoices');
+            $container.empty();
+            let overdueFound = false;
+
+            const today = new Date();
+
+            invoices.forEach(invoice => {
+                if (invoice.status === "Overdue") {
+                    overdueFound = true;
+                    const dueDate = new Date(invoice.dueDate);
+                    const daysOverdue = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
+                    $container.append(`
+                        <div class="glass-effect rounded-xl p-4 border border-opacity-30 shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer border-red-300" onclick="openArInvoiceDetailsModal(${JSON.stringify(invoice).replace(/"/g, '&quot;')})">
+                            <h4 class="text-lg font-bold text-red-700">${invoice.customerName} (Inv #${invoice.arinvoiceId})</h4>
+                            <p class="text-secondary">Amount: <span class="font-semibold text-red-600">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(invoice.amount)}</span></p>
+                            <p class="text-secondary">Due Date: <span class="font-semibold">${dueDate.toLocaleDateString()}</span></p>
+                            <p class="text-secondary">Overdue by: <span class="font-semibold">${daysOverdue} days</span></p>
+                        </div>
+                    `);
+                }
+            });
+
+            if (!overdueFound) {
+                $container.html('<div class="col-span-full text-center text-gray-500">No overdue Accounts Receivable invoices found.</div>');
+            }
+        }
+
+        // Function to render Financial Summary Table
+        function renderFinancialSummaryTable(snapshots) {
+            const $tableBody = $('#financialSummaryTableBody');
+            $tableBody.empty();
+
+            if (snapshots.length === 0) {
+                $tableBody.html('<tr><td colspan="4" class="text-center text-gray-500 py-4">No financial snapshot data available.</td></tr>');
+                return;
+            }
+
+            // Get the most recent snapshot and the one before it for comparison
+            const latestSnapshot = snapshots[snapshots.length - 1];
+            const previousSnapshot = snapshots.length > 1 ? snapshots[snapshots.length - 2] : null;
+
+            const metrics = [
+                { label: "Total Revenue", current: latestSnapshot.totalRevenue, previous: previousSnapshot?.totalRevenue },
+                { label: "Total Expenses", current: latestSnapshot.totalExpenses, previous: previousSnapshot?.totalExpenses },
+                { label: "Net Profit", current: latestSnapshot.netProfit, previous: previousSnapshot?.netProfit },
+                { label: "Cash Balance", current: latestSnapshot.cashBalance, previous: previousSnapshot?.cashBalance },
+                { label: "Accounts Receivable", current: latestSnapshot.accountsReceivableBalance, previous: previousSnapshot?.accountsReceivableBalance },
+                { label: "Accounts Payable", current: latestSnapshot.accountsPayableBalance, previous: previousSnapshot?.accountsPayableBalance },
+            ];
+
+            metrics.forEach(metric => {
+                const change = (metric.previous && metric.previous !== 0) ? ((metric.current - metric.previous) / metric.previous) * 100 : (metric.current !== 0 ? 100 : 0);
+                const changeClass = change >= 0 ? 'text-green-600' : 'text-red-600';
+                const changeArrow = change >= 0 ? '▲' : '▼'; // Unicode arrows
+
+                $tableBody.append(`
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-4 py-3 border-b border-gray-200 font-semibold text-primary">${metric.label}</td>
+                        <td class="px-4 py-3 border-b border-gray-200 text-secondary">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(metric.current)}</td>
+                        <td class="px-4 py-3 border-b border-gray-200 text-secondary">${metric.previous ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(metric.previous) : 'N/A'}</td>
+                        <td class="px-4 py-3 border-b border-gray-200 font-semibold ${changeClass}">${changeArrow} ${change.toFixed(2)}%</td>
+                    </tr>
+                `);
+            });
+        }
+
+        // Function to render Project Profitability Cards
+        function renderProjectProfitabilityCards(projects) {
+            const $container = $('#projectProfitabilityCards');
+            $container.empty();
+            if (projects.length === 0) {
+                $container.html('<div class="col-span-full text-center text-gray-500">No active projects to display profitability.</div>');
+                return;
+            }
+
+            projects.forEach(project => {
+                const profitLoss = project.revenue - project.actualCost;
+                const profitLossClass = profitLoss >= 0 ? 'text-green-600' : 'text-red-600';
+                const statusClass = project.status === "Completed" ? 'text-green-500' : (project.status === "In Progress" ? 'text-blue-500' : 'text-yellow-500');
+
+                $container.append(`
+                    <div class="glass-effect rounded-xl p-4 border border-opacity-30 shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer" onclick="openProjectDetailsModal(${JSON.stringify(project).replace(/"/g, '&quot;')})">
+                        <h4 class="text-lg font-bold text-primary">${project.projectName}</h4>
+                        <p class="text-secondary">ID: ${project.projectId}</p>
+                        <p class="text-secondary">Status: <span class="font-semibold ${statusClass}">${project.status}</span></p>
+                        <p class="text-secondary">Revenue: <span class="font-semibold">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(project.revenue)}</span></p>
+                        <p class="text-secondary">Cost: <span class="font-semibold">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(project.actualCost)}</span></p>
+                        <p class="text-secondary">Profit/Loss: <span class="font-bold ${profitLossClass}">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(profitLoss)}</span></p>
+                    </div>
+                `);
+            });
+        }
+
+
+        // --- Modals ---
+
+        // Function to open the AP Invoice details modal
+        function openApInvoiceDetailsModal(invoice) {
+            const modal = document.getElementById('apInvoiceDetailsModal');
+            document.getElementById('modalInvoiceId').textContent = invoice.apinvoiceId;
+            document.getElementById('modalVendorName').textContent = invoice.vendorName || 'N/A';
+            document.getElementById('modalInvoiceDate').textContent = invoice.invoiceDate ? new Date(invoice.invoiceDate).toLocaleDateString() : 'N/A';
+            document.getElementById('modalDueDate').textContent = invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A';
+            document.getElementById('modalAmount').textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(invoice.amount);
+            document.getElementById('modalStatus').textContent = invoice.status || 'N/A';
+            document.getElementById('modalDescription').textContent = invoice.description || 'N/A';
+            document.getElementById('modalDiscountAvailable').textContent = invoice.discountAvailable ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(invoice.discountAvailable) : 'N/A';
+            document.getElementById('modalDiscountDueDate').textContent = invoice.discountDueDate ? new Date(invoice.discountDueDate).toLocaleDateString() : 'N/A';
+            document.getElementById('modalInvoiceTitle').textContent = `Invoice Details: ${invoice.apinvoiceId}`;
+            modal.classList.remove('hidden'); // Show the modal
+        }
+
+        // Function to close the AP Invoice details modal
+        function closeApInvoiceDetailsModal() {
+            document.getElementById('apInvoiceDetailsModal').classList.add('hidden'); // Hide the modal
+        }
+
+        // Function to open the AR Invoice details modal
+        function openArInvoiceDetailsModal(invoice) {
+            const modal = document.getElementById('arInvoiceDetailsModal');
+            document.getElementById('modalArInvoiceId').textContent = invoice.arinvoiceId;
+            document.getElementById('modalCustomerName').textContent = invoice.customerName || 'N/A';
+            document.getElementById('modalArInvoiceDate').textContent = invoice.invoiceDate ? new Date(invoice.invoiceDate).toLocaleDateString() : 'N/A';
+            document.getElementById('modalArDueDate').textContent = invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A';
+            document.getElementById('modalArAmount').textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(invoice.amount);
+            document.getElementById('modalArStatus').textContent = invoice.status || 'N/A';
+            document.getElementById('modalArDescription').textContent = invoice.description || 'N/A';
+            document.getElementById('modalArInvoiceTitle').textContent = `AR Invoice Details: ${invoice.arinvoiceId}`;
+            modal.classList.remove('hidden'); // Show the modal
+        }
+
+        // Function to close the AR Invoice details modal
+        function closeArInvoiceDetailsModal() {
+            document.getElementById('arInvoiceDetailsModal').classList.add('hidden'); // Hide the modal
+        }
+
+        // Function to open the Project details modal
+        function openProjectDetailsModal(project) {
+            const modal = document.getElementById('projectDetailsModal');
+            document.getElementById('modalProjectName').textContent = project.projectName || 'N/A';
+            document.getElementById('modalProjectId').textContent = project.projectId;
+            document.getElementById('modalProjectStartDate').textContent = project.startDate ? new Date(project.startDate).toLocaleDateString() : 'N/A';
+            document.getElementById('modalProjectEndDate').textContent = project.endDate ? new Date(project.endDate).toLocaleDateString() : 'N/A';
+            document.getElementById('modalProjectBudget').textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(project.budget);
+            document.getElementById('modalProjectActualCost').textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(project.actualCost);
+            document.getElementById('modalProjectRevenue').textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(project.revenue);
+            document.getElementById('modalProjectProfit').textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(project.revenue - project.actualCost);
+            document.getElementById('modalProjectStatus').textContent = project.status || 'N/A';
+            document.getElementById('modalProjectTitle').textContent = `Project Details: ${project.projectName}`;
+            modal.classList.remove('hidden'); // Show the modal
+        }
+
+        // Function to close the Project details modal
+        function closeProjectDetailsModal() {
+            document.getElementById('projectDetailsModal').classList.add('hidden'); // Hide the modal
+        }
+
+
+        // --- Chart Initialization Functions ---
+
+        // Generic function to initialize a forecast chart
+        function initializeForecastChart(chartId, historicalData, forecastedData, title, lineColor, historicalLabel, forecastLabel) {
+            const ctx = document.getElementById(chartId)?.getContext('2d');
+            if (!ctx) return;
+
+            // Destroy existing chart instance if it exists
+            let existingChart = Chart.getChart(ctx);
+            if (existingChart) {
+                existingChart.destroy();
+            }
+
+            const allDates = [];
+            const historicalValues = [];
+            const forecastedValues = [];
+            const lowerBounds = [];
+            const upperBound = [];
+
+            // Add historical data
+            historicalData.forEach(s => {
+                allDates.push(new Date(s.snapshotDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+                // Dynamically pick the correct historical value based on chart type
+                let historicalValue;
+                if (chartId === 'cashFlowChart') {
+                    historicalValue = s.cashBalance;
+                } else if (chartId === 'materialCostChart') {
+                    historicalValue = s.materialCost;
+                } else if (chartId === 'equipmentCostChart') {
+                    historicalValue = s.equipmentCost;
+                }
+                historicalValues.push(historicalValue);
+                forecastedValues.push(null);
+                lowerBounds.push(null);
+                upperBound.push(null);
+            });
+
+            // Add forecasted data
+            forecastedData.forEach(f => {
+                allDates.push(new Date(f.forecastDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+                historicalValues.push(null);
+                forecastedValues.push(f.forecastedValue); // Use generic forecastedValue
+                lowerBounds.push(f.lowerBound);
+                upperBound.push(f.upperBound);
+            });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: allDates,
+                    datasets: [
+                        {
+                            label: historicalLabel,
+                            data: historicalValues,
+                            borderColor: lineColor,
+                            backgroundColor: Chart.helpers.color(lineColor).alpha(0.2).rgbString(),
+                            fill: false,
+                            tension: 0.3,
+                            pointBackgroundColor: lineColor,
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: lineColor
+                        },
+                        {
+                            label: forecastLabel,
+                            data: forecastedValues,
+                            borderColor: Chart.helpers.color(lineColor).alpha(0.7).rgbString(),
+                            backgroundColor: Chart.helpers.color(lineColor).alpha(0.1).rgbString(),
+                            fill: false,
+                            tension: 0.3,
+                            borderDash: [5, 5],
+                            pointBackgroundColor: Chart.helpers.color(lineColor).alpha(0.7).rgbString(),
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: Chart.helpers.color(lineColor).alpha(0.7).rgbString()
+                        },
+                        {
+                            label: 'Lower Bound',
+                            data: lowerBounds,
+                            borderColor: 'transparent',
+                            backgroundColor: Chart.helpers.color(lineColor).alpha(0.05).rgbString(),
+                            fill: '+1',
+                            tension: 0.3,
+                            pointRadius: 0,
+                            borderWidth: 0,
+                            hidden: true // Hide bounds in legend by default
+                        },
+                        {
+                            label: 'Upper Bound',
+                            data: upperBound,
+                            borderColor: 'transparent',
+                            backgroundColor: Chart.helpers.color(lineColor).alpha(0.05).rgbString(),
+                            fill: '-1',
+                            tension: 0.3,
+                            pointRadius: 0,
+                            borderWidth: 0,
+                            hidden: true // Hide bounds in legend by default
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: title,
+                            font: { size: 16, family: 'Inter, sans-serif', weight: 'bold' },
+                            color: 'var(--text-primary)'
+                        },
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: 'var(--text-primary)'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.dataset.label.includes('Bound')) return null;
+                                    return `${context.dataset.label}: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: 'var(--text-secondary)', font: { family: 'Inter, sans-serif' } },
+                            grid: { color: 'var(--border-color)' }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                color: 'var(--text-secondary)',
+                                font: { family: 'Inter, sans-serif' },
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+                                }
+                            },
+                            grid: { color: 'var(--border-color)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to initialize Budget vs. Actual Chart (remains mostly the same)
+        function initializeBudgetVsActualChart(snapshots, forecasts) {
+            const ctx = document.getElementById('budgetVsActualChart').getContext('2d');
+
+            if (budgetVsActualChartInstance) {
+                budgetVsActualChartInstance.destroy();
+            }
+
+            const labels = [];
+            const actualNetProfit = [];
+            const forecastedNetProfit = [];
+
+            snapshots.forEach(s => {
+                labels.push(new Date(s.snapshotDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+                actualNetProfit.push(s.netProfit);
+                // For dummy, we'll align based on date. In real, 'forecasts' would be your budget data.
+                const matchingForecast = forecasts.find(f => new Date(f.forecastDate).getMonth() === new Date(s.snapshotDate).getMonth() && new Date(f.forecastDate).getFullYear() === new Date(s.snapshotDate).getFullYear());
+                forecastedNetProfit.push(matchingForecast ? matchingForecast.forecastedValue : null); // Use ForecastedValue
+            });
+
+            budgetVsActualChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Actual Net Profit',
+                            data: actualNetProfit,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Budgeted Net Profit',
+                            data: forecastedNetProfit,
+                            backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Net Profit: Actual vs. Budget',
+                            font: { size: 16, family: 'Inter, sans-serif', weight: 'bold' },
+                            color: 'var(--text-primary)'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: 'var(--text-secondary)' },
+                            grid: { color: 'var(--border-color)' }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                color: 'var(--text-secondary)',
+                                font: { family: 'Inter, sans-serif' },
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+                                }
+                            },
+                            grid: { color: 'var(--border-color)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to render What-If Scenario Results
+        function renderWhatIfResults(results) {
+            const $tableBody = $('#whatIfResultsTableBody');
+            $tableBody.empty();
+
+            if (!results || results.length === 0) {
+                $tableBody.html('<tr><td colspan="6" class="text-center text-gray-500 py-4">No results for this scenario.</td></tr>');
+                return;
+            }
+
+            results.forEach(monthResult => {
+                $tableBody.append(`
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-4 py-3 border-b border-gray-200 font-semibold text-primary">${new Date(monthResult.month).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</td>
+                        <td class="px-4 py-3 border-b border-gray-200 text-secondary">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(monthResult.originalValue)}</td>
+                        <td class="px-4 py-3 border-b border-gray-200 text-secondary">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(monthResult.adjustedValue)}</td>
+                        <td class="px-4 py-3 border-b border-gray-200 text-secondary">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(monthResult.originalNetProfit)}</td>
+                        <td class="px-4 py-3 border-b border-gray-200 text-secondary">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(monthResult.adjustedNetProfit)}</td>
+                        <td class="px-4 py-3 border-b border-gray-200 text-secondary">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(monthResult.adjustedCashBalance)}</td>
+                    </tr>
+                `);
+            });
+        }
+
+
+        // --- Main Document Ready Function ---
+        $(document).ready(function () {
+            // Initial KPI update with dummy data (will be refined with actual snapshot data later)
+            const financialKpiData = {
+                cashBalance: 580000.00, // Dummy initial cash
+                arBalance: 155000.00,
+                apBalance: 4950.00,
+                availableDiscounts: 75.50
+            };
+            updateFinancialKpiCards();
+
+
+            // Fetch AP Invoices data (from your /api/Apinvoices endpoint)
+            $.ajax({
+                url: "/api/Apinvoices",
+                method: "GET",
+                dataType: "json",
+                success: function (apiInvoices) {
+                    const augmentedInvoices = apiInvoices.map(inv => {
+                        if (inv.discountAvailable === undefined || inv.discountAvailable === null) {
+                            const hasDiscount = Math.random() > 0.6;
+                            if (hasDiscount) {
+                                inv.discountAvailable = inv.amount * 0.02;
+                                const invDate = new Date(inv.invoiceDate);
+                                invDate.setDate(invDate.getDate() + 10);
+                                inv.discountDueDate = invDate.toISOString().split('T')[0];
+                            } else {
+                                inv.discountAvailable = null;
+                                inv.discountDueDate = null;
+                            }
+                        }
+                        const vendorNames = ["Tech Solutions Inc.", "Global Supplies Ltd.", "Logistics Pros", "Innovate Corp.", "Service Masters"];
+                        inv.vendorName = vendorNames[inv.vendorId % vendorNames.length];
+                        return inv;
+                    });
+
+                    let totalAP = 0;
+                    let totalAvailableDiscounts = 0;
+                    augmentedInvoices.forEach(inv => {
+                        if (inv.status === "Outstanding" || inv.status === "Overdue") {
+                            totalAP += inv.amount;
+                            if (inv.discountAvailable && inv.discountDueDate && new Date(inv.discountDueDate) >= new Date()) {
+                                totalAvailableDiscounts += inv.discountAvailable;
+                            }
+                        }
+                    });
+                    financialKpiData.apBalance = totalAP;
+                    financialKpiData.availableDiscounts = totalAvailableDiscounts;
+                    updateFinancialKpiCards();
+
+                    renderApDiscountOpportunities(augmentedInvoices);
+                    initializeApAgingChart(augmentedInvoices);
+
+                    const apInvoicesTableConfig = {
+                        tableId: "apInvoicesTable",
+                        data: augmentedInvoices,
+                        columns: [
+                            { data: "apinvoiceId", title: "Invoice ID" },
+                            { data: "vendorName", title: "Vendor" },
+                            { data: "invoiceDate", title: "Invoice Date", render: function (data) { return data ? new Date(data).toLocaleDateString() : ""; } },
+                            { data: "dueDate", title: "Due Date", render: function (data) { return data ? new Date(data).toLocaleDateString() : ""; } },
+                            { data: "amount", title: "Amount", render: $.fn.dataTable.render.number(',', '.', 2, '$') },
+                            { data: "status", title: "Status" },
+                            {
+                                data: "discountAvailable",
+                                title: "Discount Available",
+                                render: function (data) { return data ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(data) : 'N/A'; }
+                            },
+                            {
+                                data: "discountDueDate",
+                                title: "Discount Due Date",
+                                render: function (data) { return data ? new Date(data).toLocaleDateString() : 'N/A'; }
+                            },
+                            {
+                                data: null,
+                                title: "Actions",
+                                orderable: false,
+                                searchable: false,
+                                render: function (data, type, row) {
+                                    return `
+                                        <button class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 mr-2" onclick="openApInvoiceDetailsModal(${JSON.stringify(row).replace(/"/g, '&quot;')})">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                            View
+                                        </button>
+                                        <a href="/APInvoices/Edit/${row.apinvoiceId}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200 mr-2">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            Edit
+                                        </a>
+                                        <button class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200" onclick="if(confirm('Are you sure you want to delete this invoice?')) { alert('Delete functionality not implemented yet.'); }">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            Delete
+                                        </button>
+                                    `;
+                                }
+                            }
+                        ],
+                        pageLength: 10,
+                        initialIsCardView: false,
+                        initialIsChartView: false,
+                        cardViewRender: function (data) {
+                            const discountHtml = data.discountAvailable ?
+                                `<p class="text-secondary">Discount: <span class="font-semibold text-green-600">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(data.discountAvailable)}</span> (by ${new Date(data.discountDueDate).toLocaleDateString()})</p>` :
+                                `<p class="text-secondary">Discount: N/A</p>`;
+                            return `
+                                <div class="data-card glass-effect rounded-xl p-6 border hover:shadow-xl transition-shadow duration-300">
+                                    <h3 class="text-xl font-bold text-primary mb-2">${data.vendorName} (Inv #${data.apinvoiceId})</h3>
+                                    <p class="text-secondary">Amount: <span class="font-semibold">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(data.amount)}</span></p>
+                                    <p class="text-secondary">Due: ${new Date(data.dueDate).toLocaleDateString()}</p>
+                                    <p class="text-secondary">Status: ${data.status}</p>
+                                    ${discountHtml}
+                                    <div class="card-actions mt-4">
+                                        <button class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 mr-2" onclick="openApInvoiceDetailsModal(${JSON.stringify(data).replace(/"/g, '&quot;')})">View</button>
+                                        <a href="/APInvoices/Edit/${data.apinvoiceId}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200 mr-2">Edit</a>
+                                        <button class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200" onclick="if(confirm('Are you sure you want to delete this invoice?')) { alert('Delete functionality not implemented yet.'); }">Delete</button>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    };
+                    LoadDataTable(apInvoicesTableConfig);
+
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching AP Invoices:", status, error);
+                    $('#apInvoicesTable tbody').html('<tr><td colspan="9" class="text-center text-red-500">Error loading AP invoices. Please try again.</td></tr>');
+                    $('#apDiscountOpportunities').html('<div class="col-span-full text-center text-red-500">Error loading discount opportunities.</div>');
+                }
+            });
+
+            // Fetch AR Invoices data (simulating /api/Arinvoices)
+            $.ajax({
+                url: "/api/Arinvoices", // Assuming you have an ArinvoicesController
+                method: "GET",
+                dataType: "json",
+                success: function (apiArInvoices) {
+                    const augmentedArInvoices = apiArInvoices.map(inv => {
+                        const customerNames = ["Global Corp", "Local Biz", "New Ventures", "Innovate Solutions", "Dynamic Systems"];
+                        inv.customerName = customerNames[inv.customerId % customerNames.length];
+                        return inv;
+                    });
+
+                    let totalAR = 0;
+                    augmentedArInvoices.forEach(inv => {
+                        if (inv.status === "Outstanding" || inv.status === "Overdue") {
+                            totalAR += inv.amount;
+                        }
+                    });
+                    financialKpiData.arBalance = totalAR;
+                    updateFinancialKpiCards();
+
+                    renderArOverdueInvoices(augmentedArInvoices);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching AR Invoices:", status, error);
+                    $('#arOverdueInvoices').html('<div class="col-span-full text-center text-red-500">Error loading overdue AR invoices.</div>');
+                }
+            });
+
+            // Fetch Financial Snapshots data (from /api/FinancialSnapshots)
+            // This is historical data, separate from the forecasts
+            let historicalSnapshots = [];
+            $.ajax({
+                url: "/api/FinancialSnapshots",
+                method: "GET",
+                dataType: "json",
+                success: function (apiSnapshots) {
+                    historicalSnapshots = apiSnapshots.sort((a, b) => new Date(a.snapshotDate) - new Date(b.snapshotDate));
+
+                    // Update Cash Balance KPI with the latest snapshot
+                    if (historicalSnapshots.length > 0) {
+                        financialKpiData.cashBalance = historicalSnapshots[historicalSnapshots.length - 1].cashBalance;
+                        updateFinancialKpiCards();
+                    }
+
+                    // Render Financial Summary Table
+                    renderFinancialSummaryTable(historicalSnapshots);
+
+                    // --- Fetch all forecasts from the mocked controller ---
+                    // Cash Balance Forecast
+                    $.ajax({
+                        url: "/api/FinancialForecasts/cashbalance",
+                        method: "GET",
+                        dataType: "json",
+                        success: function (cashForecasts) {
+                            initializeForecastChart(
+                                'cashFlowChart',
+                                historicalSnapshots,
+                                cashForecasts,
+                                'Historical & Forecasted Cash Balance',
+                                'rgba(54, 162, 235, 1)', // Blue
+                                'Historical Cash Balance',
+                                'Forecasted Cash Balance'
+                            );
+                            // Also use cash forecasts for budget vs actual (as a stand-in for budgeted net profit)
+                            initializeBudgetVsActualChart(historicalSnapshots, cashForecasts);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error fetching Cash Balance Forecasts:", status, error);
+                            $('#cashFlowChart').parent().append('<p class="text-red-500 text-center text-sm mt-2">Error loading cash balance forecasts.</p>');
+                        }
+                    });
+
+                    // Material Cost Forecast
+                    $.ajax({
+                        url: "/api/FinancialForecasts/materialcost",
+                        method: "GET",
+                        dataType: "json",
+                        success: function (materialCostForecasts) {
+                            initializeForecastChart(
+                                'materialCostChart',
+                                historicalSnapshots, // Use historical snapshots for context
+                                materialCostForecasts,
+                                'Historical & Forecasted Material Cost',
+                                'rgba(255, 159, 64, 1)', // Orange
+                                'Historical Material Cost',
+                                'Forecasted Material Cost'
+                            );
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error fetching Material Cost Forecasts:", status, error);
+                            $('#materialCostChart').parent().append('<p class="text-red-500 text-center text-sm mt-2">Error loading material cost forecasts.</p>');
+                        }
+                    });
+
+                    // Equipment Cost Forecast
+                    $.ajax({
+                        url: "/api/FinancialForecasts/equipmentcost",
+                        method: "GET",
+                        dataType: "json",
+                        success: function (equipmentCostForecasts) {
+                            initializeForecastChart(
+                                'equipmentCostChart',
+                                historicalSnapshots, // Use historical snapshots for context
+                                equipmentCostForecasts,
+                                'Historical & Forecasted Equipment Cost',
+                                'rgba(75, 192, 192, 1)', // Greenish-blue
+                                'Historical Equipment Cost',
+                                'Forecasted Equipment Cost'
+                            );
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error fetching Equipment Cost Forecasts:", status, error);
+                            $('#equipmentCostChart').parent().append('<p class="text-red-500 text-center text-sm mt-2">Error loading equipment cost forecasts.</p>');
+                        }
+                    });
+
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching Financial Snapshots:", status, error);
+                    $('#cashFlowChart').parent().html('<p class="text-red-500 text-center">Error loading historical financial data.</p>');
+                    $('#financialSummaryTableBody').html('<tr><td colspan="4" class="text-center text-red-500 py-4">Error loading financial summary.</td></tr>');
+                    $('#budgetVsActualChart').parent().html('<p class="text-red-500 text-center">Error loading budget vs actual data.</p>');
+                }
+            });
+
+            // Fetch Projects data (simulating /api/Projects or a combined financial summary)
+            $.ajax({
+                url: "/api/Projects", // Assuming you have a ProjectsController
+                method: "GET",
+                dataType: "json",
+                success: function (apiProjects) {
+                    renderProjectProfitabilityCards(apiProjects);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching Projects data:", status, error);
+                    $('#projectProfitabilityCards').html('<div class="col-span-full text-center text-red-500">Error loading project profitability.</div>');
+                }
+            });
+
+
+            // --- What-If Scenario Button Event Listener ---
+            $('#runWhatIfScenarioBtn').on('click', function () {
+                const costType = $('#costTypeSelect').val();
+                const reductionPercentage = parseFloat($('#reductionPercentageInput').val());
+
+                if (isNaN(reductionPercentage) || reductionPercentage <= 0 || reductionPercentage >= 100) {
+                    alert('Please enter a valid reduction percentage between 1 and 99.');
+                    return;
+                }
+
+                // Show loading indicator
+                $('#whatIfResultsTableBody').html('<tr><td colspan="6" class="text-center text-gray-500 py-4">Running scenario...</td></tr>');
+                $('#scenarioDescription').text('Calculating...');
+
+                $.ajax({
+                    url: `/api/FinancialForecasts/whatif/costreduction?costType=${costType}&reductionPercentage=${reductionPercentage}`,
+                    method: "POST", // Use POST as defined in your controller
+                    dataType: "json",
+                    success: function (response) {
+                        $('#scenarioDescription').text(response.scenarioDescription);
+                        renderWhatIfResults(response.results);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error running What-If scenario:", status, error);
+                        $('#whatIfResultsTableBody').html('<tr><td colspan="6" class="text-center text-red-500 py-4">Error running scenario. Please check console.</td></tr>');
+                        $('#scenarioDescription').text('Error!');
+                    }
+                });
+            });
+
+
+            // Attach event listeners to close buttons of modals
+            $('#closeApInvoiceDetailsModalBtn').on('click', closeApInvoiceDetailsModal);
+            $('#closeArInvoiceDetailsModalBtn').on('click', closeArInvoiceDetailsModal);
+            $('#closeProjectDetailsModalBtn').on('click', closeProjectDetailsModal);
+        });
+    </script>
+}

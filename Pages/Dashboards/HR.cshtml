@@ -1,0 +1,122 @@
+﻿@page
+@model MyApp.Namespace.HRModel
+@{
+    ViewData["Title"] = "HR Dashboard";
+
+}
+<div class="mx-auto p-4 sm:p-6 lg:p-8 glass-effect rounded-lg">
+    <h2 class="text-4xl themed-heading font-extrabold mb-6 border-b-4 pb-2 inline-block">HR Dashboard: People & Performance</h2>
+
+    <!-- Key HR Metrics (KPIs) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Total Employees</h3>
+            <p class="text-4xl font-bold text-blue-600 mt-auto">450</p>
+            <span class="text-sm text-gray-500">Full-time: 380, Part-time: 70</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">New Hires (YTD)</h3>
+            <p class="text-4xl font-bold text-green-600 mt-auto">55</p>
+            <span class="text-sm text-gray-500">Last Month: 8</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Employee Turnover Rate</h3>
+            <p class="text-4xl font-bold text-red-600 mt-auto">12.5%</p>
+            <span class="text-sm text-gray-500">Industry Avg: 15%</span>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border flex flex-col justify-between shadow-md">
+            <h3 class="text-lg font-semibold text-primary mb-2">Open Positions</h3>
+            <p class="text-4xl font-bold text-purple-600 mt-auto">23</p>
+            <span class="text-sm text-gray-500">Avg. Time to Fill: 45 days</span>
+        </div>
+    </div>
+
+    <!-- HR Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="data-card glass-effect rounded-xl p-6 border shadow-md">
+            <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Employee Demographics by Department</h3>
+            <div style="height: 300px;">
+                @* Fixed height for chart container *!/
+                <canvas id="employeeDemographicsChart"></canvas>
+            </div>
+        </div>
+        <div class="data-card glass-effect rounded-xl p-6 border shadow-md">
+            <h3 class="text-xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Hiring Trend (Last 12 Months)</h3>
+            <div style="height: 300px;"> @* Fixed height for chart container *!/
+                <canvas id="hiringTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Employee Changes Table -->
+    <div class="mb-8">
+        <h3 class="text-2xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">Recent Employee Changes</h3>
+        <div class="mb-6 flex flex-wrap gap-4 items-center">
+            <button id="toggleViewBtn_hrEmployeeChangesTable" class="flex items-center px-6 py-3 btn-themed font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-blue-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Switch to Card View
+            </button>
+            <button id="toggleChartBtn_hrEmployeeChangesTable" class="flex items-center px-6 py-3 btn-themed-secondary font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-green-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>
+                Show Chart
+            </button>
+        </div>
+
+        <table id="hrEmployeeChangesTable" class="display w-full text-left border-collapse rounded-lg shadow-md" style="width:100%">
+            <thead>
+                <tr>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tl-xl">Employee ID</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Employee Name</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Change Type</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Date</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Department</th>
+                    <th class="px-4 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider rounded-tr-xl">Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                @* DataTables will populate this tbody *@
+                </tbody>
+                </table>
+
+                <div id="hrEmployeeChangesTable-card-view" class="mt-8 cards-grid-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" style="display: none;"></div>
+                <div id="hrEmployeeChangesTable-chart-container" style="display: none;">
+                    <canvas id="hrEmployeeChangesTable-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Quick Links / HR Tools Section -->
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold themed-heading mb-4 border-b-2 pb-2 inline-block">HR Tools & Quick Links</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a href="/HR/Employees" class="data-card glass-effect rounded-xl p-6 border hover:shadow-xl transition-shadow duration-300 flex items-center justify-center flex-col text-center">
+                        <svg class="w-16 h-16 text-blue-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2c0-.653-.134-1.28-.387-1.857M17 20H7m10 0h-4m-4 0H7m4 0v-2c0-.653-.134-1.28-.387-1.857M7 20v-2a3 3 0 015.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653-.134-1.28-.387-1.857M7 20H2v-2a3 3 0 015.356-1.857"></path></svg>
+                        <span class="text-xl font-semibold text-primary">Manage Employees</span>
+                    </a>
+                    <a href="/HR/Payroll" class="data-card glass-effect rounded-xl p-6 border hover:shadow-xl transition-shadow duration-300 flex items-center justify-center flex-col text-center">
+                        <svg class="w-16 h-16 text-green-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.592 1M12 8V3m0 9v3m0 0h3.25M12 15h-3.25m-3.655-2.83C4.12 10.45 3 8.358 3 6c0-1.657 1.343-3 3-3h12c1.657 0 3 1.343 3 3 0 2.358-1.12 4.45-2.345 5.17M12 15a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+                        <span class="text-xl font-semibold text-primary">Payroll Processing</span>
+                    </a>
+                    <a href="/HR/Recruitment" class="data-card glass-effect rounded-xl p-6 border hover:shadow-xl transition-shadow duration-300 flex items-center justify-center flex-col text-center">
+                        <svg class="w-16 h-16 text-yellow-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 012-2h2a2 2 0 012 2v1m-4 0h-4"></path></svg>
+                        <span class="text-xl font-semibold text-primary">Recruitment & Onboarding</span>
+                    </a>
+                    <a href="/HR/Performance" class="data-card glass-effect rounded-xl p-6 border hover:shadow-xl transition-shadow duration-300 flex items-center justify-center flex-col text-center">
+                        <svg class="w-16 h-16 text-orange-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c-1.31 0-2.54-.42-3.54-1.16M9 19a8.974 8.974 0 01-3.54-1.16M9 19a8.974 8.974 0 01-3.54-1.16"></path></svg>
+                        <span class="text-xl font-semibold text-primary">Performance Reviews</span>
+                    </a>
+                    <a href="/HR/Training" class="data-card glass-effect rounded-xl p-6 border hover:shadow-xl transition-shadow duration-300 flex items-center justify-center flex-col text-center">
+                        <svg class="w-16 h-16 text-teal-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.207 5 7.5 5S4.168 5.477 3 6.253m9 0c1.168-.776 2.832-1.253 4.5-1.253s3.332.477 4.5 1.253m-9 0V12m0 0v-1.253M12 12h-3m3 0h3m-3 0c-1.168 0-2.832.477-4.5 1.253m9 0c1.168 0 2.832.477 4.5 1.253M12 12v6.747M12 12c-1.168 0-2.832-.477-4.5-1.253m9 0c1.168 0 2.832-.477 4.5-1.253"></path></svg>
+                        <span class="text-xl font-semibold text-primary">Training & Development</span>
+                    </a>
+                    <a href="/HR/Compliance" class="data-card glass-effect rounded-xl p-6 border hover:shadow-xl transition-shadow duration-300 flex items-center justify-center flex-col text-center">
+                        <svg class="w-16 h-16 text-indigo-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="text-xl font-semibold text-primary">HR Compliance</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
