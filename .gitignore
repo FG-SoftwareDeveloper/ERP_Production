@@ -3,6 +3,7 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+
 # User-specific files
 *.rsuser
 *.suo
@@ -426,5 +427,23 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
-# Ignore environment-specific appsettings files
-appsettings.*.json
+# IDE / local settings
+.idea/
+.vscode/
+.config/
+
+# Local secrets & overrides
+appsettings.json
+appsettings.*.local.json
+secrets.json
+appsettings.*.secrets.json
+appsettings.Development.json
+# Local user secrets
+secrets/
+
+
+# Azure publish/service profiles (contain creds)
+Properties/serviceDependencies*.json
+
+# Optional scaffolding notes
+ScaffoldingReadMe.txt
